@@ -1,43 +1,67 @@
 # Dry Run Plumbing rules file.
-# This is the only source of policy the agent may speak from. If it is not in
-# here, the agent does not know it. Validated against rules/schema.json.
-# Prices are CAD. The company is fictional; the shape is what matters.
+# The only source of policy the agent may speak from. If it is not in here, the
+# agent does not know it. Validated against rules/schema.json at push and eval time.
+#
+# Numbers are CAD and grounded in a 2026-09-12 survey of Metro Vancouver shops and
+# cost guides; see docs/plumbing-research.md for sources. The company is fictional,
+# so licence numbers and the on-call plumber are placeholders shaped like the real thing.
 
-version: 1
+version: 2
 
 business:
   name: Dry Run Plumbing
   city: Vancouver, BC
   timezone: America/Vancouver
-  service_area: Vancouver, Burnaby, North Vancouver, West Vancouver, Richmond
+  service_area: Vancouver, Burnaby, North Vancouver, West Vancouver, Richmond, New Westminster
+  outside_area_line: We usually work in Vancouver, Burnaby, the North Shore, Richmond, and New West. A plumber will confirm whether we can reach you.
   phone_is_recorded: true
-  crew_model: solo            # solo | crew. See docs/decisions.md. Solo for now.
+  crew_model: solo            # solo | crew. See docs/decisions.md.
+  mailing_address: 1234 Placeholder St, Vancouver, BC V5K 0A1   # fictional; CASL requires one on every text
+  public_phone: "+1 604 555 0199"                                  # fictional
+
+licensing:
+  # Fictional numbers in the real formats so the agent can answer "are you licensed?" from data.
+  vancouver_business_licence: "26-000000"
+  technical_safety_bc_gas_licence: none     # not a gas contractor; see out_of_scope
+  red_seal_plumber: true
+  insured_and_worksafebc_registered: true
+  answer_line: Yes. We hold a City of Vancouver business licence, our plumber is Red Seal certified, and we're insured and registered with WorkSafeBC.
 
 hours:
   regular:
     mon_fri: "08:00-17:00"
-    sat: "09:00-13:00"
-    sun: closed
-  after_hours_line: true      # the AI receptionist answers outside regular hours
-  holidays: closed
+    sat_sun: "09:00-13:00 booked visits only, regular rate"
+  after_hours_line: true      # the AI receptionist answers outside regular hours, 24/7
+  holidays: emergencies only
+  arrival_windows:
+    booked_visits: two-hour windows
+    emergency: 60 to 90 minutes from dispatch
+    call_ahead_minutes: 30
 
 on_call:
-  # Solo shop: one plumber, one number. Number lives in the environment, not here.
   plumber_name: Sam
   contact_env_var: ONCALL_PHONE_NUMBER
   channels:
     sms: enabled              # the only escalation channel built in this demo
-    call: config_only         # exists as a value, not wired
+    call: config_only
     email: config_only
   callback_promise_minutes: 15   # emergencies only; see urgency_tiers.*.callback
+  escalation_chain:               # config only; n8n retries the first, the rest are not wired
+    - on_call
+    - owner
 
 urgency_tiers:
+  # Containment rule, from real dispatch practice: if the caller can isolate the
+  # problem with a shutoff, it drops one tier.
   emergency:
-    definition: Water actively running or pouring and it cannot be stopped, sewage backing up, no water to the whole house, or any gas smell.
+    definition: Water actively running or pouring and it cannot be stopped, water touching electrical, sewage backing up into living space, no water to the whole home, or any gas smell.
     triage_signals:
-      - water is running or pouring, not dripping
+      - water is running, spraying, or pouring, not dripping, and no shutoff has stopped it
       - caller cannot find or cannot turn a shutoff
-      - sewage or foul water coming up a drain
+      - water is reaching outlets, a panel, or appliances
+      - water is coming through a ceiling or into another unit
+      - sewage or foul water coming up a drain or toilet
+      - no water at all in the home
       - smell of gas
     response: safety_instruction_then_escalate
     photo: never
@@ -45,22 +69,24 @@ urgency_tiers:
     dispatch: same_night
     callback: The on-call plumber will call you back within 15 minutes.
   urgent:
-    definition: Water is contained for now but the problem will get worse within a day, or the household has no hot water, no working toilet, or a single fixture is unusable.
+    definition: The problem is contained for now but will get worse within a day, or the household has no hot water, no working toilet, a frozen pipe, or a single fixture unusable.
     triage_signals:
-      - drip or leak that has been slowed or stopped with a shutoff
+      - leak that has been slowed or stopped with a shutoff
       - only toilet in the home not working
       - no hot water
+      - frozen pipe with no burst yet
+      - sump pump not running during heavy rain
     response: intake_photo_quote_book
     photo: ask
     quote: yes
-    dispatch: next_available_slot
+    dispatch: first_slot_next_morning
     callback: A plumber will call you first thing in the morning to book the next open slot.
   routine:
     definition: Contained problem, nothing getting worse, household still functional.
     triage_signals:
       - slow drip with shutoff closed
       - dripping faucet
-      - slow drain
+      - slow drain with other drains working
       - running toilet with a second toilet available
     response: intake_photo_quote_book
     photo: ask
@@ -69,45 +95,76 @@ urgency_tiers:
     callback: A plumber will call you during business hours on the next business day to go over next steps.
 
 triage:
-  # Ask both before naming a tier. One question per turn.
+  # Ask both before naming a tier. One question per turn. If the caller answers
+  # both in one breath, do not re-ask.
   questions:
     - id: flow
       ask: Is it a slow drip, or is water actually running?
     - id: shutoff
       ask: Is there a shutoff valve you can reach and turn?
-  # If the caller answers both in one breath, do not re-ask.
+  # Not asked, but listened for. Any of these moves the call to emergency.
+  listen_for:
+    - water near outlets, a panel, or appliances
+    - water coming through a ceiling or from the unit above
+    - water going into the unit below
+    - sewage, or water coming up a floor drain
+    - no water anywhere in the home
+    - gas smell, even hedged
 
 safety_instructions:
   water_running:
     - Find the main water shutoff, usually where the water line enters the house, near the water meter, or in the basement or garage, and turn it clockwise until it stops.
     - If you cannot find it or it will not turn, move valuables away from the water and stay clear of any outlets or electrical panels near the water.
+    - If the water is hot, also turn off the water heater.
+  water_running_strata:
+    - Look for the suite shutoff, usually in the entry closet, under a sink, or in a utility chase, and turn it clockwise until it stops.
+    - Do not try to shut off the building's water. Call your building manager or strata emergency line now; they control the riser and main shutoffs.
   sewage_backup:
     - Stop running water and do not flush any toilets.
     - Keep people and pets away from the affected area.
+  frozen_pipe:
+    - Close the main shutoff so a burst is contained, then open the affected faucet.
+    - Gentle heat only, like a hair dryer or a warm room. No torches or open flame.
   gas_smell:
-    - Leave the building now. Do not flip switches, unplug anything, or use a phone inside.
-    - From outside, call the gas utility emergency line or 911. This is not something a plumber attends first.
+    # FortisBC wording. A plumber is not the first responder for gas.
+    - Stop what you're doing. Don't use your phone inside, don't smoke, and don't touch any switches.
+    - Go outside now, and leave the door open behind you.
+    - Once outside, call the FortisBC emergency line at 1-800-663-9911 or 911.
     - Do not collect intake. Do not escalate to the plumber. The call ends after the instruction.
 
+property:
+  # Asked only when the address has a unit number or the caller says condo,
+  # apartment, or strata. Otherwise assume a house.
+  types: [house, condo_or_strata, rental_apartment, commercial]
+  strata_notes:
+    - Fixtures and pipes serving only the suite are the owner's. Risers, stacks, and pipes in shared walls are common property and the strata's.
+    - If the leak is coming from above or going below, the caller should notify strata or building management in parallel. We may need their authorization and access to attend.
+    - Never promise to shut off building water.
+  tenant_notes:
+    - If the caller rents, ask who should approve the work, the caller or the landlord, and collect the landlord's contact if the landlord approves.
+  ask_when: emergency_path_or_booking   # never mid-intake on a routine call
+
 job_types:
+  # price_band_cad is the typical all-in range for the repair, service fee included.
+  # A null band means no number until a plumber has looked.
   p_trap_leak:
     label: Leak at the P-trap or drain joint under a sink
     typical_tier: routine
-    price_band_cad: {min: 250, max: 400}
+    price_band_cad: {min: 175, max: 350}
     notes: Higher end if the trap is replaced.
   supply_line_leak:
     label: Leak at a supply line or shutoff valve under a sink or toilet
     typical_tier: urgent
-    price_band_cad: {min: 200, max: 350}
+    price_band_cad: {min: 150, max: 350}
   faucet_drip:
     label: Dripping faucet
     typical_tier: routine
-    price_band_cad: {min: 150, max: 300}
-    notes: Cartridge replacement is the common fix. Full faucet replacement is quoted separately.
+    price_band_cad: {min: 150, max: 350}
+    notes: Cartridge replacement is the common fix. Full faucet replacement is quoted separately after the visit.
   toilet_running:
     label: Toilet running or not filling
     typical_tier: routine
-    price_band_cad: {min: 150, max: 275}
+    price_band_cad: {min: 130, max: 300}
   toilet_clogged:
     label: Toilet clogged
     typical_tier: urgent
@@ -115,40 +172,67 @@ job_types:
   drain_slow_or_clogged:
     label: Slow or clogged sink, tub, or shower drain
     typical_tier: routine
-    price_band_cad: {min: 175, max: 350}
+    price_band_cad: {min: 150, max: 400}
+    notes: Snaking. Camera inspection or hydro jetting is quoted separately.
   water_heater_no_hot:
     label: No hot water
     typical_tier: urgent
     price_band_cad: {min: 200, max: 450}
-    notes: Diagnostic and minor repair. Replacement is quoted separately after the visit.
+    notes: Diagnostic and minor repair. Tank replacement runs into the thousands and is quoted in writing after the visit, never on the phone.
+  frozen_pipe:
+    label: Frozen pipe, no burst yet
+    typical_tier: urgent
+    price_band_cad: {min: 250, max: 600}
+  sump_pump_failure:
+    label: Sump pump not running
+    typical_tier: urgent
+    price_band_cad: null
+    notes: Repair versus replacement decided on site.
   burst_pipe:
     label: Burst or split pipe, water running
     typical_tier: emergency
-    price_band_cad: null        # no quote on emergencies
+    price_band_cad: null
   sewer_backup:
     label: Sewage backing up
     typical_tier: emergency
     price_band_cad: null
+  no_water:
+    label: No water to the whole home
+    typical_tier: emergency
+    price_band_cad: null
+    notes: Ask whether neighbours are also out; if so it is likely the city, not the home.
   unknown:
     label: Not clearly one of the above
     typical_tier: routine
-    price_band_cad: null        # no number until a plumber looks
+    price_band_cad: null
 
 pricing_policy:
   currency: CAD
+  model: Upfront flat-rate. The plumber diagnoses on site and gives a firm price before any work starts.
+  service_call_fee_cad: 120
+  service_call_fee_line: "There's a $120 service call fee plus tax, which covers the visit and diagnosis. It's waived if you go ahead with the repair."
+  service_call_fee_waived_if_work_approved: true
   quotes_are_preliminary: true
-  quote_line: Preliminary, based on the photo and description. Final price confirmed on site before any work starts.
-  weekend_surcharge: "None. Saturday and Sunday visits are the regular rate. The only premium is the after-hours emergency callout fee."
-  after_hours_emergency_callout_cad: 175   # added to the job, emergencies only
-  diagnostic_fee_cad: 95                    # waived if the repair goes ahead
+  quote_line: A typical range for this kind of repair, based on the photo and what you've told me. The plumber confirms the price on site before any work starts, and won't go above it without your okay.
+  weekend_surcharge: "None. Saturday and Sunday booked visits are the regular rate. The only premium is the after-hours emergency callout fee."
+  after_hours_emergency_callout_cad: 199
+  after_hours_line: "For an after-hours emergency there's a $199 callout fee on top of the repair. I have to tell you that before we send anyone."
+  state_fees_before_booking: true      # BC consumer law: fees get the same prominence as the rate, before commitment
   payment_methods: [credit card, debit, e-transfer]
+  warranty: One year on parts and labour for parts we supply. Drain cleaning excluded.
   never_state_a_number_outside_the_band: true
   never_state_a_number_without_a_job_type: true
+  big_ticket_in_writing_only: [water heater replacement, tankless install, repiping, sewer line, water main]
+
+permits:
+  # City of Vancouver: repairs, faucet and fixture swaps in place, and clearing clogs need no permit.
+  no_permit: [repair leaks, replace valves or faucets, replace fixtures in the same spot, clear clogged drains]
+  otherwise_line: Our plumber will confirm whether a permit is needed, and we pull it for you.
 
 escalation:
   channel: sms
   to: on_call
-  message_includes: [caller_name, callback_number, address, problem_summary, urgency_tier, shutoff_status]
+  message_includes: [caller_name, callback_number, address, property_type, problem_summary, urgency_tier, shutoff_status]
   tell_the_caller: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
   if_escalation_fails: Tell the caller you are having trouble reaching the on-call line and ask them to call back in five minutes. Do not pretend it went through.
 
@@ -156,6 +240,10 @@ intake_fields:
   order: [name, address, callback_number]
   callback_number: default_to_caller_id_and_confirm
   address_needs: [street number and name, city, unit if any]
+  conditional:
+    property_type: in the emergency path before the shutoff instruction (it changes the instruction), otherwise at booking time. Never mid-intake on a routine call.
+    owner_or_tenant: at booking time
+    access: at booking time, ask about buzzer or gate code, pets, and parking
 
 follow_up:
   after_quote_no_booking:
@@ -167,16 +255,25 @@ follow_up:
     ask: Was the repair completed and how did it go?
   max_follow_ups: 2
 
+seasonal:
+  # Honest ETAs during demand surges. The agent may say this when it is true.
+  surge_notice: We're getting a lot of calls right now, so wait times are longer than usual. I'll be straight with you about timing.
+  cold_snap: Burst and frozen pipe calls spike when overnight temperatures stay below minus five for two days. Triage frozen (no burst yet, urgent) from burst (emergency).
+  heavy_rain: Water coming up a floor drain during heavy rain is a sewer backup, not a leak. Tell the caller not to run water.
+
 compliance:
-  recording_disclosure: Quick heads up, this call is recorded and you're speaking with an AI assistant.
+  # Recording notice needs a purpose under Canadian privacy guidance. AI disclosure is best practice, not law, in BC.
+  recording_disclosure: Quick heads up, this call is recorded for quality and to help with your quote, and you're speaking with an AI assistant.
   ai_disclosure_on_request: Yes, I'm an AI assistant for Dry Run Plumbing. I can take your details and get a plumber lined up, and a real person will follow up.
   sms_opt_out_line: Reply STOP to any of our texts to opt out.
+  sms_footer: Dry Run Plumbing, 1234 Placeholder St, Vancouver BC, 604 555 0199. Reply STOP to opt out.
   spoken_close: I'll text a summary. Reply STOP to any of our texts to opt out.
+  stop_honoured: immediately
 
 out_of_scope:
-  # Things the agent must not answer or do. Say so plainly and move on.
-  - gas appliance work
+  # Say plainly that Dry Run does not do it and move on.
+  - gas appliance or gas line work, we are not a licensed gas contractor
   - electrical work
   - warranty or insurance claim decisions
-  - firm or final prices
+  - firm or final prices on the phone
   - anything not in this file

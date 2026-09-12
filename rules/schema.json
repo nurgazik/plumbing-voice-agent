@@ -3,32 +3,50 @@
   "title": "Dry Run Plumbing rules file",
   "description": "What a valid rules file must contain. The agent may only speak policy that is present here.",
   "type": "object",
-  "required": ["version", "business", "hours", "on_call", "urgency_tiers", "triage", "safety_instructions", "job_types", "pricing_policy", "escalation", "intake_fields", "follow_up", "compliance", "out_of_scope"],
+  "required": ["version", "business", "licensing", "hours", "on_call", "urgency_tiers", "triage", "safety_instructions", "property", "job_types", "pricing_policy", "permits", "escalation", "intake_fields", "follow_up", "seasonal", "compliance", "out_of_scope"],
   "properties": {
     "version": {"type": "integer", "minimum": 1},
     "business": {
       "type": "object",
-      "required": ["name", "city", "timezone", "service_area", "phone_is_recorded", "crew_model"],
+      "required": ["name", "city", "timezone", "service_area", "outside_area_line", "phone_is_recorded", "crew_model", "mailing_address", "public_phone"],
       "properties": {
         "name": {"type": "string"},
         "city": {"type": "string"},
         "timezone": {"type": "string"},
         "service_area": {"type": "string"},
+        "outside_area_line": {"type": "string"},
         "phone_is_recorded": {"type": "boolean"},
-        "crew_model": {"enum": ["solo", "crew"]}
+        "crew_model": {"enum": ["solo", "crew"]},
+        "mailing_address": {"type": "string", "description": "CASL: every commercial text must carry a mailing address."},
+        "public_phone": {"type": "string"}
+      }
+    },
+    "licensing": {
+      "type": "object",
+      "required": ["vancouver_business_licence", "technical_safety_bc_gas_licence", "red_seal_plumber", "insured_and_worksafebc_registered", "answer_line"],
+      "properties": {
+        "technical_safety_bc_gas_licence": {"description": "A licence string if the company is a gas contractor, else none."},
+        "red_seal_plumber": {"type": "boolean"},
+        "insured_and_worksafebc_registered": {"type": "boolean"},
+        "answer_line": {"type": "string"}
       }
     },
     "hours": {
       "type": "object",
-      "required": ["regular", "after_hours_line"],
+      "required": ["regular", "after_hours_line", "arrival_windows"],
       "properties": {
         "regular": {"type": "object"},
-        "after_hours_line": {"type": "boolean"}
+        "after_hours_line": {"type": "boolean"},
+        "arrival_windows": {
+          "type": "object",
+          "required": ["booked_visits", "emergency", "call_ahead_minutes"],
+          "properties": {"call_ahead_minutes": {"type": "integer", "minimum": 0}}
+        }
       }
     },
     "on_call": {
       "type": "object",
-      "required": ["plumber_name", "contact_env_var", "channels", "callback_promise_minutes"],
+      "required": ["plumber_name", "contact_env_var", "channels", "callback_promise_minutes", "escalation_chain"],
       "properties": {
         "plumber_name": {"type": "string"},
         "contact_env_var": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
@@ -37,7 +55,8 @@
           "required": ["sms"],
           "additionalProperties": {"enum": ["enabled", "config_only", "disabled"]}
         },
-        "callback_promise_minutes": {"type": "integer", "minimum": 1}
+        "callback_promise_minutes": {"type": "integer", "minimum": 1},
+        "escalation_chain": {"type": "array", "items": {"type": "string"}, "minItems": 1}
       }
     },
     "urgency_tiers": {
@@ -45,7 +64,7 @@
       "required": ["emergency", "urgent", "routine"],
       "additionalProperties": {
         "type": "object",
-        "required": ["definition", "triage_signals", "response", "photo", "quote", "dispatch"],
+        "required": ["definition", "triage_signals", "response", "photo", "quote", "dispatch", "callback"],
         "properties": {
           "definition": {"type": "string"},
           "triage_signals": {"type": "array", "items": {"type": "string"}, "minItems": 1},
@@ -59,7 +78,7 @@
     },
     "triage": {
       "type": "object",
-      "required": ["questions"],
+      "required": ["questions", "listen_for"],
       "properties": {
         "questions": {
           "type": "array",
@@ -69,17 +88,28 @@
             "required": ["id", "ask"],
             "properties": {"id": {"type": "string"}, "ask": {"type": "string"}}
           }
-        }
+        },
+        "listen_for": {"type": "array", "items": {"type": "string"}, "minItems": 1}
       }
     },
     "safety_instructions": {
       "type": "object",
-      "required": ["water_running", "sewage_backup", "gas_smell"],
+      "required": ["water_running", "water_running_strata", "sewage_backup", "frozen_pipe", "gas_smell"],
       "additionalProperties": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+    },
+    "property": {
+      "type": "object",
+      "required": ["types", "strata_notes", "tenant_notes", "ask_when"],
+      "properties": {
+        "types": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "strata_notes": {"type": "array", "items": {"type": "string"}},
+        "tenant_notes": {"type": "array", "items": {"type": "string"}},
+        "ask_when": {"type": "string"}
+      }
     },
     "job_types": {
       "type": "object",
-      "required": ["unknown"],
+      "required": ["unknown", "burst_pipe", "sewer_backup"],
       "additionalProperties": {
         "type": "object",
         "required": ["label", "typical_tier", "price_band_cad"],
@@ -102,12 +132,25 @@
     },
     "pricing_policy": {
       "type": "object",
-      "required": ["currency", "quotes_are_preliminary", "quote_line", "weekend_surcharge", "after_hours_emergency_callout_cad", "never_state_a_number_outside_the_band", "never_state_a_number_without_a_job_type"],
+      "required": ["currency", "model", "service_call_fee_cad", "service_call_fee_line", "service_call_fee_waived_if_work_approved", "quotes_are_preliminary", "quote_line", "weekend_surcharge", "after_hours_emergency_callout_cad", "after_hours_line", "state_fees_before_booking", "payment_methods", "warranty", "never_state_a_number_outside_the_band", "never_state_a_number_without_a_job_type", "big_ticket_in_writing_only"],
       "properties": {
         "currency": {"const": "CAD"},
+        "service_call_fee_cad": {"type": "number", "minimum": 0},
+        "after_hours_emergency_callout_cad": {"type": "number", "minimum": 0},
         "quotes_are_preliminary": {"const": true},
+        "state_fees_before_booking": {"const": true},
         "never_state_a_number_outside_the_band": {"const": true},
-        "never_state_a_number_without_a_job_type": {"const": true}
+        "never_state_a_number_without_a_job_type": {"const": true},
+        "payment_methods": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "big_ticket_in_writing_only": {"type": "array", "items": {"type": "string"}}
+      }
+    },
+    "permits": {
+      "type": "object",
+      "required": ["no_permit", "otherwise_line"],
+      "properties": {
+        "no_permit": {"type": "array", "items": {"type": "string"}},
+        "otherwise_line": {"type": "string"}
       }
     },
     "escalation": {
@@ -120,13 +163,21 @@
     },
     "intake_fields": {
       "type": "object",
-      "required": ["order"],
-      "properties": {"order": {"type": "array", "items": {"type": "string"}, "minItems": 1}}
+      "required": ["order", "conditional"],
+      "properties": {
+        "order": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+        "conditional": {"type": "object"}
+      }
     },
     "follow_up": {"type": "object", "required": ["after_visit", "max_follow_ups"]},
+    "seasonal": {
+      "type": "object",
+      "required": ["surge_notice", "cold_snap", "heavy_rain"],
+      "additionalProperties": {"type": "string"}
+    },
     "compliance": {
       "type": "object",
-      "required": ["recording_disclosure", "ai_disclosure_on_request", "sms_opt_out_line", "spoken_close"],
+      "required": ["recording_disclosure", "ai_disclosure_on_request", "sms_opt_out_line", "sms_footer", "spoken_close", "stop_honoured"],
       "additionalProperties": {"type": "string"}
     },
     "out_of_scope": {"type": "array", "items": {"type": "string"}}

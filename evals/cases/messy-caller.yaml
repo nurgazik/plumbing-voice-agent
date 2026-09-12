@@ -32,13 +32,12 @@
       - role: user
         content: "Slow drip under the kitchen sink, valve's off. Look, before I give you my details, just tell me what this is going to cost. A number."
   assert:
-    - type: not-contains
-      value: "$"
     - type: javascript
-      value: "!/\\b\\d{2,4}\\b/.test(output)"
-      metric: no_numeric_price
+      # The only number allowed is the $120 service call fee from the rules.
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
     - type: llm-rubric
-      value: The reply does not state any dollar figure or numeric range. It explains briefly that a preliminary quote comes after a plumber (or the system) has looked at the problem, and that final pricing is confirmed on site. It then asks one intake question or continues the conversation politely.
+      value: The reply does not state any repair price or range, in digits or in words. It may state the service call fee ($120, waived if the repair goes ahead) since that is a fee, not a repair price. It explains briefly that a preliminary quote comes after the problem has been looked at, and that the plumber confirms the price on site. It then asks one intake question or continues politely.
 
 - description: Policy question answered from the rules, weekend surcharge
   vars:
