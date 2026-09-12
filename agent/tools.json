@@ -1,0 +1,88 @@
+{
+  "_comment": "Tool definitions in a neutral shape. push.ts maps each to a Retell custom function whose url is the n8n webhook. Fields: name, description, parameters (JSON Schema), speak_during_execution, speak_after_execution, built (which build step wires it).",
+  "tools": [
+    {
+      "name": "get_photo_analysis",
+      "built": 2,
+      "description": "Fetch the analysis of the most recent photo the caller texted to this number during this call. Call it only after the caller says the photo is sent. Returns nothing if no photo has arrived yet; if so, tell the caller it has not come through and wait, then try once more.",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "caller_phone": {"type": "string", "description": "Caller's phone number in E.164, from the call metadata."}
+        },
+        "required": ["caller_phone"]
+      }
+    },
+    {
+      "name": "send_quote",
+      "built": 3,
+      "description": "Send the caller a preliminary quote by text for the identified job type. The price band comes from the rules file on the server side; do not pass a price. Call it once, after the photo has been discussed, and only for urgent or routine tiers.",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "caller_phone": {"type": "string"},
+          "job_type": {"type": "string", "description": "A job_types key from the rules file, for example p_trap_leak."},
+          "severity": {"type": "string", "enum": ["routine", "urgent"]},
+          "summary": {"type": "string", "description": "One sentence describing the problem in the caller's terms."}
+        },
+        "required": ["caller_phone", "job_type", "severity", "summary"]
+      }
+    },
+    {
+      "name": "get_availability",
+      "built": 4,
+      "description": "Get the next open appointment windows for the given urgency. Call it right after the quote is sent so booking can be offered without the caller asking.",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "urgency": {"type": "string", "enum": ["routine", "urgent"]},
+          "address": {"type": "string"}
+        },
+        "required": ["urgency"]
+      }
+    },
+    {
+      "name": "book_slot",
+      "built": 4,
+      "description": "Book one of the windows returned by get_availability. Sends the confirmation text.",
+      "speak_during_execution": false,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "caller_phone": {"type": "string"},
+          "caller_name": {"type": "string"},
+          "address": {"type": "string"},
+          "slot_id": {"type": "string", "description": "The id of the chosen window, as returned by get_availability."},
+          "job_type": {"type": "string"}
+        },
+        "required": ["caller_phone", "caller_name", "address", "slot_id", "job_type"]
+      }
+    },
+    {
+      "name": "escalate",
+      "built": 7,
+      "description": "Text the on-call plumber for an emergency. Call it only after the safety instruction has been given and intake is collected. If it returns an error, tell the caller you are having trouble reaching the on-call line and ask them to call back in five minutes; do not say the plumber is coming.",
+      "speak_during_execution": true,
+      "speak_after_execution": true,
+      "parameters": {
+        "type": "object",
+        "properties": {
+          "caller_name": {"type": "string"},
+          "callback_number": {"type": "string"},
+          "address": {"type": "string"},
+          "problem_summary": {"type": "string"},
+          "urgency_tier": {"type": "string", "enum": ["emergency", "urgent"]},
+          "shutoff_status": {"type": "string", "enum": ["local_off", "main_off", "cannot_shut_off", "unknown"]}
+        },
+        "required": ["caller_name", "callback_number", "address", "problem_summary", "urgency_tier", "shutoff_status"]
+      }
+    }
+  ]
+}

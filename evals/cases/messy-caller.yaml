@@ -1,0 +1,69 @@
+# Variants from the "could go wrong" lists. Same drip scene unless noted.
+- description: Rambling caller gets one question back
+  vars:
+    conversation:
+      - role: user
+        content: "Okay so we bought this place last year and honestly the previous owners did a lot of stuff themselves, like the deck is a whole thing, and the kitchen sink has been kind of weird since spring, there's a smell sometimes, and now tonight I opened the cabinet to get the dish soap and it's wet in there, like there's a little puddle, and my partner thinks we should just call a plumber but I wasn't sure if it's a tonight thing."
+  assert:
+    - type: llm-rubric
+      value: The reply acknowledges the situation in a few words without retelling the story, then asks exactly one question, which should be the first triage question (is it a drip or is water running). It does not comment on the deck or the previous owners.
+
+- description: Vague address gets one clarifying question
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "It's Priya."
+      - role: assistant
+        content: "Thanks Priya. And the address where the sink is?"
+      - role: user
+        content: "It's the grey building on Commercial Drive, near the SkyTrain."
+  assert:
+    - type: llm-rubric
+      value: The reply asks one clarifying question to get a usable address, such as the street number and unit. It does not accept "the grey building" as an address and does not move on to the next intake field yet.
+
+- description: Caller wants a firm price, agent gives no number
+  vars:
+    conversation:
+      - role: user
+        content: "Slow drip under the kitchen sink, valve's off. Look, before I give you my details, just tell me what this is going to cost. A number."
+  assert:
+    - type: not-contains
+      value: "$"
+    - type: javascript
+      value: "!/\\b\\d{2,4}\\b/.test(output)"
+      metric: no_numeric_price
+    - type: llm-rubric
+      value: The reply does not state any dollar figure or numeric range. It explains briefly that a preliminary quote comes after a plumber (or the system) has looked at the problem, and that final pricing is confirmed on site. It then asks one intake question or continues the conversation politely.
+
+- description: Policy question answered from the rules, weekend surcharge
+  vars:
+    conversation:
+      - role: user
+        content: "Slow drip under the sink, valve's off, name's Dana, 1420 West 12th, Vancouver. Quick question, is there a weekend surcharge if someone comes Sunday?"
+  assert:
+    - type: llm-rubric
+      value: The reply says there is no weekend surcharge. It may add that the only premium is an after-hours emergency callout fee. It does not invent any other fee, discount, or condition, and does not state a repair price.
+
+- description: Question outside the rules file gets an honest "don't know"
+  vars:
+    conversation:
+      - role: user
+        content: "Slow drip under the sink, it's handled for tonight. Unrelated, do you guys install gas fireplaces? And do you take Bitcoin?"
+  assert:
+    - type: llm-rubric
+      value: The reply says Dry Run does not do gas appliance work. For Bitcoin, it either says the payment methods it knows (credit card, debit, e-transfer) or says it does not have that information and a plumber will confirm. It does not claim to accept Bitcoin and does not invent any service.
+    - type: not-icontains
+      value: "yes, we accept bitcoin"
+
+- description: Out of service area
+  vars:
+    conversation:
+      - role: user
+        content: "Hi, slow drip under my sink, valve's off. I'm out in Abbotsford, do you come out this far?"
+  assert:
+    - type: llm-rubric
+      value: The reply does not confidently promise service in Abbotsford, because Abbotsford is not in the listed service area. It either says Abbotsford is outside the usual area, or says it is not sure and a plumber will confirm. It does not invent a travel fee or a number.

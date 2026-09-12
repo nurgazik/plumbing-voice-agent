@@ -1,0 +1,52 @@
+# Beats 2 through 6 of the emergency call. Escalation tool beats come in step 7.
+- description: Water spraying and local taps are stuck, safety instruction comes first
+  vars:
+    conversation:
+      - role: user
+        content: "There's water everywhere, a pipe behind the washer just went and it's spraying, I don't know what to do."
+      - role: assistant
+        content: "Okay, first thing, let's get the water off. Is there a shutoff valve behind the washer you can reach, usually two small taps where the hoses connect?"
+      - role: user
+        content: "I tried, they're stuck, I can't turn them."
+  assert:
+    - type: llm-rubric
+      value: The reply tells the caller to go to the main water shutoff for the house, describes where it usually is (where the water line enters, near the meter, basement or garage) and how to turn it (clockwise until it stops), and says it will stay on the line or wait. It does NOT ask for the caller's name or address in this turn, does NOT ask for a photo, and does NOT mention any price.
+    - type: icontains
+      value: "main"
+    - type: not-contains
+      value: "$"
+    - type: not-icontains
+      value: "photo"
+
+- description: Running water, no shutoff question asked yet, first turn
+  vars:
+    conversation:
+      - role: user
+        content: "Help, water is pouring out from under my bathroom sink, like actually pouring, the floor's flooding."
+  assert:
+    - type: llm-rubric
+      value: The reply treats the running water as answered and does not ask whether it is a drip. It asks one question or gives one instruction about a shutoff valve the caller can reach. It does not ask for a name, address, or photo, and does not mention a price.
+
+- description: Gas smell ends everything else
+  vars:
+    conversation:
+      - role: user
+        content: "My water heater's leaking a bit and also, I don't know if this matters, but it kind of smells like gas down here."
+  assert:
+    - type: llm-rubric
+      value: The reply tells the caller to leave the building now, not to touch switches or use a phone inside, and to call the gas utility emergency line or 911 from outside. It drops the water heater topic entirely. It does NOT ask for a name, address, or photo, does not mention a price, and does not say a plumber is coming.
+    - type: icontains-any
+      value: ["911", "gas utility", "gas company"]
+    - type: not-icontains
+      value: "photo"
+
+- description: Water stopped by the shutoff at 2 am, no same-night promise
+  vars:
+    conversation:
+      - role: user
+        content: "A hose behind my washer split and it was spraying everywhere, but I got the taps turned and it's stopped now. It's 2 in the morning though, can someone come now?"
+  assert:
+    - type: llm-rubric
+      value: The reply recognises the water is stopped and does not treat this as a tonight-emergency. It does not promise anyone will come out tonight and does not promise a callback within 15 minutes. It reassures the caller in a sentence and asks one intake question, such as their name, or says a plumber will call back about the next open slot.
+    - type: not-contains
+      value: "$"

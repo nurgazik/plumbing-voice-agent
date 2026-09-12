@@ -1,0 +1,33 @@
+# yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
+description: Dry Run Plumbing, step 1 (intake and triage, no tools)
+
+prompts:
+  - file://prompt.js
+
+providers:
+  - id: anthropic:messages:claude-haiku-4-5-20251001
+    label: haiku-turns
+    config:
+      max_tokens: 300
+      temperature: 0.3
+
+defaultTest:
+  options:
+    # Grader for llm-rubric assertions. Sonnet judges, Haiku answers.
+    provider: anthropic:messages:claude-sonnet-5
+  assert:
+    # Voice constraints that apply to every turn.
+    - type: javascript
+      value: "(output.match(/\\?/g) || []).length <= 1"
+      metric: one_question_per_turn
+    - type: not-contains-any
+      value: ["**", "##", "- ", "1.", "•"]
+      metric: no_markdown
+    - type: javascript
+      value: "output.split(/\\s+/).length <= 70"
+      metric: short_turn
+
+tests:
+  - file://cases/*.yaml
+
+outputPath: output/latest.json

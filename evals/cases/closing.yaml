@@ -1,0 +1,25 @@
+# Beat 9. Step 1 closes after intake with a callback promise, no booking yet.
+- description: Close includes the STOP line verbatim
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Got it. Is this the best number to reach you on?"
+      - role: user
+        content: "Yep, this one's fine. That's everything?"
+  assert:
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: llm-rubric
+      value: The reply says in one sentence what happens next (a plumber will call back, or a summary text is coming), includes the opt-out line, and ends the call warmly. It does not promise a specific arrival time, does not state a price, and does not ask for a photo.
+    - type: not-contains
+      value: "$"

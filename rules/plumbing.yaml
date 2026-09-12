@@ -1,0 +1,179 @@
+# Dry Run Plumbing rules file.
+# This is the only source of policy the agent may speak from. If it is not in
+# here, the agent does not know it. Validated against rules/schema.json.
+# Prices are CAD. The company is fictional; the shape is what matters.
+
+version: 1
+
+business:
+  name: Dry Run Plumbing
+  city: Vancouver, BC
+  timezone: America/Vancouver
+  service_area: Vancouver, Burnaby, North Vancouver, West Vancouver, Richmond
+  phone_is_recorded: true
+  crew_model: solo            # solo | crew. See docs/decisions.md. Solo for now.
+
+hours:
+  regular:
+    mon_fri: "08:00-17:00"
+    sat: "09:00-13:00"
+    sun: closed
+  after_hours_line: true      # the AI receptionist answers outside regular hours
+  holidays: closed
+
+on_call:
+  # Solo shop: one plumber, one number. Number lives in the environment, not here.
+  plumber_name: Sam
+  contact_env_var: ONCALL_PHONE_NUMBER
+  channels:
+    sms: enabled              # the only escalation channel built in this demo
+    call: config_only         # exists as a value, not wired
+    email: config_only
+  callback_promise_minutes: 15
+
+urgency_tiers:
+  emergency:
+    definition: Water actively running or pouring and it cannot be stopped, sewage backing up, no water to the whole house, or any gas smell.
+    triage_signals:
+      - water is running or pouring, not dripping
+      - caller cannot find or cannot turn a shutoff
+      - sewage or foul water coming up a drain
+      - smell of gas
+    response: safety_instruction_then_escalate
+    photo: never
+    quote: never
+    dispatch: same_night
+  urgent:
+    definition: Water is contained for now but the problem will get worse within a day, or the household has no hot water, no working toilet, or a single fixture is unusable.
+    triage_signals:
+      - drip or leak that has been slowed or stopped with a shutoff
+      - only toilet in the home not working
+      - no hot water
+    response: intake_photo_quote_book
+    photo: ask
+    quote: yes
+    dispatch: next_available_slot
+  routine:
+    definition: Contained problem, nothing getting worse, household still functional.
+    triage_signals:
+      - slow drip with shutoff closed
+      - dripping faucet
+      - slow drain
+      - running toilet with a second toilet available
+    response: intake_photo_quote_book
+    photo: ask
+    quote: yes
+    dispatch: next_business_slot
+
+triage:
+  # Ask both before naming a tier. One question per turn.
+  questions:
+    - id: flow
+      ask: Is it a slow drip, or is water actually running?
+    - id: shutoff
+      ask: Is there a shutoff valve you can reach and turn?
+  # If the caller answers both in one breath, do not re-ask.
+
+safety_instructions:
+  water_running:
+    - Find the main water shutoff, usually where the water line enters the house, near the water meter, or in the basement or garage, and turn it clockwise until it stops.
+    - If you cannot find it or it will not turn, move valuables away from the water and stay clear of any outlets or electrical panels near the water.
+  sewage_backup:
+    - Stop running water and do not flush any toilets.
+    - Keep people and pets away from the affected area.
+  gas_smell:
+    - Leave the building now. Do not flip switches, unplug anything, or use a phone inside.
+    - From outside, call the gas utility emergency line or 911. This is not something a plumber attends first.
+    - Do not collect intake. Do not escalate to the plumber. The call ends after the instruction.
+
+job_types:
+  p_trap_leak:
+    label: Leak at the P-trap or drain joint under a sink
+    typical_tier: routine
+    price_band_cad: {min: 250, max: 400}
+    notes: Higher end if the trap is replaced.
+  supply_line_leak:
+    label: Leak at a supply line or shutoff valve under a sink or toilet
+    typical_tier: urgent
+    price_band_cad: {min: 200, max: 350}
+  faucet_drip:
+    label: Dripping faucet
+    typical_tier: routine
+    price_band_cad: {min: 150, max: 300}
+    notes: Cartridge replacement is the common fix. Full faucet replacement is quoted separately.
+  toilet_running:
+    label: Toilet running or not filling
+    typical_tier: routine
+    price_band_cad: {min: 150, max: 275}
+  toilet_clogged:
+    label: Toilet clogged
+    typical_tier: urgent
+    price_band_cad: {min: 150, max: 300}
+  drain_slow_or_clogged:
+    label: Slow or clogged sink, tub, or shower drain
+    typical_tier: routine
+    price_band_cad: {min: 175, max: 350}
+  water_heater_no_hot:
+    label: No hot water
+    typical_tier: urgent
+    price_band_cad: {min: 200, max: 450}
+    notes: Diagnostic and minor repair. Replacement is quoted separately after the visit.
+  burst_pipe:
+    label: Burst or split pipe, water running
+    typical_tier: emergency
+    price_band_cad: null        # no quote on emergencies
+  sewer_backup:
+    label: Sewage backing up
+    typical_tier: emergency
+    price_band_cad: null
+  unknown:
+    label: Not clearly one of the above
+    typical_tier: routine
+    price_band_cad: null        # no number until a plumber looks
+
+pricing_policy:
+  currency: CAD
+  quotes_are_preliminary: true
+  quote_line: Preliminary, based on the photo and description. Final price confirmed on site before any work starts.
+  weekend_surcharge: none
+  after_hours_emergency_callout_cad: 175   # added to the job, emergencies only
+  diagnostic_fee_cad: 95                    # waived if the repair goes ahead
+  payment_methods: [credit card, debit, e-transfer]
+  never_state_a_number_outside_the_band: true
+  never_state_a_number_without_a_job_type: true
+
+escalation:
+  channel: sms
+  to: on_call
+  message_includes: [caller_name, callback_number, address, problem_summary, urgency_tier, shutoff_status]
+  tell_the_caller: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
+  if_escalation_fails: Tell the caller you are having trouble reaching the on-call line and ask them to call back in five minutes. Do not pretend it went through.
+
+intake_fields:
+  order: [name, address, callback_number]
+  callback_number: default_to_caller_id_and_confirm
+  address_needs: [street number and name, city, unit if any]
+
+follow_up:
+  after_quote_no_booking:
+    delay_hours: 24
+    channel: sms
+  after_visit:
+    delay_hours: 24
+    channel: sms
+    ask: Was the repair completed and how did it go?
+  max_follow_ups: 2
+
+compliance:
+  recording_disclosure: Quick heads up, this call is recorded and you're speaking with an AI assistant.
+  ai_disclosure_on_request: Yes, I'm an AI assistant for Dry Run Plumbing. I can take your details and get a plumber lined up, and a real person will follow up.
+  sms_opt_out_line: Reply STOP to any of our texts to opt out.
+  spoken_close: I'll text a summary. Reply STOP to any of our texts to opt out.
+
+out_of_scope:
+  # Things the agent must not answer or do. Say so plainly and move on.
+  - gas appliance work
+  - electrical work
+  - warranty or insurance claim decisions
+  - firm or final prices
+  - anything not in this file

@@ -1,0 +1,133 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Dry Run Plumbing rules file",
+  "description": "What a valid rules file must contain. The agent may only speak policy that is present here.",
+  "type": "object",
+  "required": ["version", "business", "hours", "on_call", "urgency_tiers", "triage", "safety_instructions", "job_types", "pricing_policy", "escalation", "intake_fields", "follow_up", "compliance", "out_of_scope"],
+  "properties": {
+    "version": {"type": "integer", "minimum": 1},
+    "business": {
+      "type": "object",
+      "required": ["name", "city", "timezone", "service_area", "phone_is_recorded", "crew_model"],
+      "properties": {
+        "name": {"type": "string"},
+        "city": {"type": "string"},
+        "timezone": {"type": "string"},
+        "service_area": {"type": "string"},
+        "phone_is_recorded": {"type": "boolean"},
+        "crew_model": {"enum": ["solo", "crew"]}
+      }
+    },
+    "hours": {
+      "type": "object",
+      "required": ["regular", "after_hours_line"],
+      "properties": {
+        "regular": {"type": "object"},
+        "after_hours_line": {"type": "boolean"}
+      }
+    },
+    "on_call": {
+      "type": "object",
+      "required": ["plumber_name", "contact_env_var", "channels", "callback_promise_minutes"],
+      "properties": {
+        "plumber_name": {"type": "string"},
+        "contact_env_var": {"type": "string", "pattern": "^[A-Z0-9_]+$"},
+        "channels": {
+          "type": "object",
+          "required": ["sms"],
+          "additionalProperties": {"enum": ["enabled", "config_only", "disabled"]}
+        },
+        "callback_promise_minutes": {"type": "integer", "minimum": 1}
+      }
+    },
+    "urgency_tiers": {
+      "type": "object",
+      "required": ["emergency", "urgent", "routine"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["definition", "triage_signals", "response", "photo", "quote", "dispatch"],
+        "properties": {
+          "definition": {"type": "string"},
+          "triage_signals": {"type": "array", "items": {"type": "string"}, "minItems": 1},
+          "response": {"enum": ["safety_instruction_then_escalate", "intake_photo_quote_book"]},
+          "photo": {"enum": ["never", "ask"]},
+          "quote": {"enum": ["never", "yes"]},
+          "dispatch": {"type": "string"}
+        }
+      }
+    },
+    "triage": {
+      "type": "object",
+      "required": ["questions"],
+      "properties": {
+        "questions": {
+          "type": "array",
+          "minItems": 2,
+          "items": {
+            "type": "object",
+            "required": ["id", "ask"],
+            "properties": {"id": {"type": "string"}, "ask": {"type": "string"}}
+          }
+        }
+      }
+    },
+    "safety_instructions": {
+      "type": "object",
+      "required": ["water_running", "sewage_backup", "gas_smell"],
+      "additionalProperties": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+    },
+    "job_types": {
+      "type": "object",
+      "required": ["unknown"],
+      "additionalProperties": {
+        "type": "object",
+        "required": ["label", "typical_tier", "price_band_cad"],
+        "properties": {
+          "label": {"type": "string"},
+          "typical_tier": {"enum": ["emergency", "urgent", "routine"]},
+          "price_band_cad": {
+            "oneOf": [
+              {"type": "null"},
+              {
+                "type": "object",
+                "required": ["min", "max"],
+                "properties": {"min": {"type": "number", "minimum": 0}, "max": {"type": "number", "minimum": 0}}
+              }
+            ]
+          },
+          "notes": {"type": "string"}
+        }
+      }
+    },
+    "pricing_policy": {
+      "type": "object",
+      "required": ["currency", "quotes_are_preliminary", "quote_line", "weekend_surcharge", "after_hours_emergency_callout_cad", "never_state_a_number_outside_the_band", "never_state_a_number_without_a_job_type"],
+      "properties": {
+        "currency": {"const": "CAD"},
+        "quotes_are_preliminary": {"const": true},
+        "never_state_a_number_outside_the_band": {"const": true},
+        "never_state_a_number_without_a_job_type": {"const": true}
+      }
+    },
+    "escalation": {
+      "type": "object",
+      "required": ["channel", "to", "message_includes", "tell_the_caller", "if_escalation_fails"],
+      "properties": {
+        "channel": {"enum": ["sms", "call", "email"]},
+        "message_includes": {"type": "array", "items": {"type": "string"}, "minItems": 1}
+      }
+    },
+    "intake_fields": {
+      "type": "object",
+      "required": ["order"],
+      "properties": {"order": {"type": "array", "items": {"type": "string"}, "minItems": 1}}
+    },
+    "follow_up": {"type": "object", "required": ["after_visit", "max_follow_ups"]},
+    "compliance": {
+      "type": "object",
+      "required": ["recording_disclosure", "ai_disclosure_on_request", "sms_opt_out_line", "spoken_close"],
+      "additionalProperties": {"type": "string"}
+    },
+    "out_of_scope": {"type": "array", "items": {"type": "string"}}
+  }
+}

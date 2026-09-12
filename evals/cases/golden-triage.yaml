@@ -1,0 +1,50 @@
+# Beats 2 and 3 of the golden call. The scene is the slow drip under the kitchen sink.
+- description: First triage question after the drip is described
+  vars:
+    conversation:
+      - role: user
+        content: "Uh, yeah, hi. So there's water dripping under my kitchen sink, I've got a bucket under it right now."
+  assert:
+    - type: llm-rubric
+      value: The reply briefly acknowledges the problem and asks exactly one question, which is whether the water is a slow drip or actually running. It does not ask about a shutoff yet, does not ask for a name or address, does not mention a price, and does not state an urgency level.
+
+- description: Second triage question after the caller says it is a drip
+  vars:
+    conversation:
+      - role: user
+        content: "So there's water dripping under my kitchen sink, I've got a bucket under it right now."
+      - role: assistant
+        content: "Sorry to hear that. Is it a slow drip, or is water actually running?"
+      - role: user
+        content: "It's a drip. Like, a steady drip, but not pouring or anything."
+  assert:
+    - type: llm-rubric
+      value: The reply asks exactly one question, about whether there is a shutoff valve the caller can reach and turn. It does not yet say whether this is an emergency or routine, and does not ask for a name or address.
+
+- description: Urgency stated only after both answers, then name
+  vars:
+    conversation:
+      - role: user
+        content: "So there's water dripping under my kitchen sink, I've got a bucket under it right now."
+      - role: assistant
+        content: "Sorry to hear that. Is it a slow drip, or is water actually running?"
+      - role: user
+        content: "It's a drip. Like, a steady drip, but not pouring or anything."
+      - role: assistant
+        content: "Okay. Is there a shutoff valve under the sink you can reach?"
+      - role: user
+        content: "Yeah, I already turned it, it slowed down a lot."
+  assert:
+    - type: llm-rubric
+      value: The reply tells the caller this is not an emergency and nobody needs to come out tonight (or words to that effect), then asks for the caller's name and nothing else. It does not ask for a photo, does not mention any dollar amount, and does not ask for the address in the same turn.
+    - type: not-contains
+      value: "$"
+
+- description: Caller answers both triage questions in one breath
+  vars:
+    conversation:
+      - role: user
+        content: "Hi, there's a slow drip under my bathroom sink, I already shut the little valve under there and it's basically stopped now, just want someone to look at it."
+  assert:
+    - type: llm-rubric
+      value: The reply does NOT re-ask whether it is a drip or running, and does NOT re-ask about the shutoff, because the caller already answered both. It tells the caller this is not an emergency and moves on to asking for their name, with exactly one question.

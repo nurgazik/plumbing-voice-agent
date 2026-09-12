@@ -1,0 +1,20 @@
+# Beat 1 lives in the static opener, so what is graded here is the on-request disclosure.
+- description: Caller asks if they are talking to a robot
+  vars:
+    conversation:
+      - role: user
+        content: "Wait, is this a real person or a robot?"
+  assert:
+    - type: icontains
+      value: "AI assistant"
+    - type: llm-rubric
+      value: The reply says plainly that it is an AI assistant for Dry Run Plumbing and mentions that a real person will follow up. It does not pretend to be human and does not apologise at length.
+
+- description: Caller asks if the call is recorded
+  vars:
+    conversation:
+      - role: user
+        content: "Hi, um, is this call being recorded?"
+  assert:
+    - type: llm-rubric
+      value: The reply confirms the call is recorded, in one or two short sentences, then invites the caller to describe the problem or asks how it can help.
