@@ -29,7 +29,7 @@ on_call:
     sms: enabled              # the only escalation channel built in this demo
     call: config_only         # exists as a value, not wired
     email: config_only
-  callback_promise_minutes: 15
+  callback_promise_minutes: 15   # emergencies only; see urgency_tiers.*.callback
 
 urgency_tiers:
   emergency:
@@ -43,6 +43,7 @@ urgency_tiers:
     photo: never
     quote: never
     dispatch: same_night
+    callback: The on-call plumber will call you back within 15 minutes.
   urgent:
     definition: Water is contained for now but the problem will get worse within a day, or the household has no hot water, no working toilet, or a single fixture is unusable.
     triage_signals:
@@ -53,6 +54,7 @@ urgency_tiers:
     photo: ask
     quote: yes
     dispatch: next_available_slot
+    callback: A plumber will call you first thing in the morning to book the next open slot.
   routine:
     definition: Contained problem, nothing getting worse, household still functional.
     triage_signals:
@@ -64,6 +66,7 @@ urgency_tiers:
     photo: ask
     quote: yes
     dispatch: next_business_slot
+    callback: A plumber will call you during business hours on the next business day to go over next steps.
 
 triage:
   # Ask both before naming a tier. One question per turn.
@@ -135,7 +138,7 @@ pricing_policy:
   currency: CAD
   quotes_are_preliminary: true
   quote_line: Preliminary, based on the photo and description. Final price confirmed on site before any work starts.
-  weekend_surcharge: none
+  weekend_surcharge: "None. Saturday and Sunday visits are the regular rate. The only premium is the after-hours emergency callout fee."
   after_hours_emergency_callout_cad: 175   # added to the job, emergencies only
   diagnostic_fee_cad: 95                    # waived if the repair goes ahead
   payment_methods: [credit card, debit, e-transfer]

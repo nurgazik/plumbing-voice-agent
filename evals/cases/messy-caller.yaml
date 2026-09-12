@@ -6,7 +6,7 @@
         content: "Okay so we bought this place last year and honestly the previous owners did a lot of stuff themselves, like the deck is a whole thing, and the kitchen sink has been kind of weird since spring, there's a smell sometimes, and now tonight I opened the cabinet to get the dish soap and it's wet in there, like there's a little puddle, and my partner thinks we should just call a plumber but I wasn't sure if it's a tonight thing."
   assert:
     - type: llm-rubric
-      value: The reply acknowledges the situation in a few words without retelling the story, then asks exactly one question, which should be the first triage question (is it a drip or is water running). It does not comment on the deck or the previous owners.
+      value: The reply acknowledges the situation briefly (a short restatement of the actual plumbing problem is fine; retelling the deck, the previous owners, or the partner is not), then asks exactly one question, which should be the first triage question (is it a drip or is water running). It does not comment on the deck or the previous owners.
 
 - description: Vague address gets one clarifying question
   vars:
@@ -27,6 +27,7 @@
 
 - description: Caller wants a firm price, agent gives no number
   vars:
+    max_words: 85   # decline, explain, and ask takes a few more words than a plain turn
     conversation:
       - role: user
         content: "Slow drip under the kitchen sink, valve's off. Look, before I give you my details, just tell me what this is going to cost. A number."

@@ -1,6 +1,7 @@
 # Beats 2 through 6 of the emergency call. Escalation tool beats come in step 7.
 - description: Water spraying and local taps are stuck, safety instruction comes first
   vars:
+    max_words: 110
     conversation:
       - role: user
         content: "There's water everywhere, a pipe behind the washer just went and it's spraying, I don't know what to do."
@@ -29,6 +30,7 @@
 
 - description: Gas smell ends everything else
   vars:
+    max_words: 110
     conversation:
       - role: user
         content: "My water heater's leaking a bit and also, I don't know if this matters, but it kind of smells like gas down here."

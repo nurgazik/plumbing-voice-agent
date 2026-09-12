@@ -52,7 +52,8 @@
           "response": {"enum": ["safety_instruction_then_escalate", "intake_photo_quote_book"]},
           "photo": {"enum": ["never", "ask"]},
           "quote": {"enum": ["never", "yes"]},
-          "dispatch": {"type": "string"}
+          "dispatch": {"type": "string"},
+          "callback": {"type": "string", "description": "Exactly what the agent may promise about a callback for this tier. Nothing else may be promised."}
         }
       }
     },

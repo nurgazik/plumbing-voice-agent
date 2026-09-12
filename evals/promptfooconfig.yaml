@@ -20,14 +20,20 @@ defaultTest:
     - type: javascript
       value: "(output.match(/\\?/g) || []).length <= 1"
       metric: one_question_per_turn
-    - type: not-contains-any
-      value: ["**", "##", "- ", "1.", "•"]
+    - type: javascript
+      # No bold, no headings, no bullet or numbered lines. "911." is not a list.
+      value: "!/(^|\\n)\\s*([-*\u2022]|\\d+\\.)\\s|\\*\\*|(^|\\n)#{1,6}\\s/.test(output)"
       metric: no_markdown
     - type: javascript
-      value: "output.split(/\\s+/).length <= 70"
+      # Voice turns stay short. Safety-instruction cases raise vars.max_words.
+      value: "output.split(/\\s+/).length <= (Number(context.vars.max_words) || 70)"
       metric: short_turn
 
 tests:
   - file://cases/*.yaml
+
+evaluateOptions:
+  # Every case runs twice at the real temperature. A flaky turn is a failing turn.
+  repeat: 2
 
 outputPath: output/latest.json
