@@ -177,7 +177,12 @@
     },
     "compliance": {
       "type": "object",
-      "required": ["recording_disclosure", "ai_disclosure_on_request", "sms_opt_out_line", "sms_footer", "spoken_close", "stop_honoured"],
+      "required": ["recording_disclosure", "ai_disclosure_on_request", "sms_consent_required_before_first_text", "sms_consent_ask", "sms_consent_declined", "sms_opt_out_line", "sms_footer", "spoken_close", "stop_honoured"],
+      "properties": {
+        "sms_consent_required_before_first_text": {"type": "boolean", "description": "A2P: carriers require a verbal consent script on file when opt-in is collected by phone."},
+        "sms_consent_ask": {"type": "string", "description": "Spoken word for word before the first text of the call. Names the channel, the rates disclaimer, and STOP."},
+        "sms_consent_declined": {"type": "string"}
+      },
       "additionalProperties": {"type": "string"}
     },
     "out_of_scope": {"type": "array", "items": {"type": "string"}}

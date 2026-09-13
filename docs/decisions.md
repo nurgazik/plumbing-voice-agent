@@ -2,6 +2,7 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-13 The agent asks for verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask`, and sends nothing on a no. Twilio's A2P checker rejected the campaign for claiming verbal opt-in with no script on file, and the claim was in fact aspirational: nothing in the prompt or rules ever asked. The eval case is owed at step 3, when the first text actually sends.
 - 2026-09-13 Privacy policy and terms live in the portfolio site repo at nurgazy.com/dryrunplumbing/privacy and /terms, not in `web/`, because the A2P brand is registered to Ray personally and a matching domain reads better to a vetting reviewer. `docs/compliance-pages.md` has the pointer.
 - 2026-09-13 The public pages promise 90-day deletion of recordings, transcripts, and photos. That is a commitment with no implementation yet; a deletion job is owed in the n8n layer once Supabase is live.
 - 2026-09-12 Retell's built-in Claude 4.5 Haiku, billed by Retell, instead of BYOK. Retell support confirms BYOK is unsupported for the built-in LLM; the alternative is a custom LLM websocket server, which is out of scope. CLAUDE.md's "BYOK" line should be updated.

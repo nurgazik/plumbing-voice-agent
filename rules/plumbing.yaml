@@ -265,6 +265,11 @@ compliance:
   # Recording notice needs a purpose under Canadian privacy guidance. AI disclosure is best practice, not law, in BC.
   recording_disclosure: Quick heads up, this call is recorded for quality and to help with your quote, and you're speaking with an AI assistant.
   ai_disclosure_on_request: Yes, I'm an AI assistant for Dry Run Plumbing. I can take your details and get a plumber lined up, and a real person will follow up.
+  # Verbal SMS consent. Asked once, before the first text of the call, and the
+  # recording is the record of consent. No text goes out on a no.
+  sms_consent_required_before_first_text: true
+  sms_consent_ask: I can text the quote and the appointment details to this number. Standard message and data rates may apply, and you can reply STOP any time. Is that okay?
+  sms_consent_declined: No problem, I won't text you. The plumber will go over everything when they call.
   sms_opt_out_line: Reply STOP to any of our texts to opt out.
   sms_footer: Dry Run Plumbing, 1234 Placeholder St, Vancouver BC, 604 555 0199. Reply STOP to opt out.
   spoken_close: I'll text a summary. Reply STOP to any of our texts to opt out.

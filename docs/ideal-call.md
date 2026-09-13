@@ -21,7 +21,9 @@ Scene: Saturday, 9:40 pm. First-time caller. Slow leak under a kitchen sink. Rou
 | Agent: "Got it, one moment while I take a look." | Tool call `get_photo_analysis`. Twilio's MMS webhook already hit n8n, which pulled the image, ran Sonnet vision, and stored a structured result in Supabase. If the tool returns nothing yet, the agent says it hasn't come through and waits, then retries. |
 | Agent: "That looks like the joint at the P-trap, the curved pipe under the drain. Very common, nothing dangerous, just keep the valve off tonight. Do you know roughly how old the plumbing under there is?" | Photo result used live. Example line, not a fixed one. |
 | Caller: "No idea honestly, we bought the house last year." | |
-| Agent: "No problem. A repair like this usually runs $250 to $400, depending on whether the trap needs replacing. I'm texting you a preliminary quote now, and I can get someone booked while we're on the line. Let me check the schedule." | Tool call `send_quote` with job type, severity, summary. n8n picks the band from the rules file, sends the SMS, stores the quote. Then tool call `get_availability` with urgency routine; n8n asks Cal.com for open slots. |
+| Agent: "No problem. A repair like this usually runs $250 to $400, depending on whether the trap needs replacing. I can text the quote and the appointment details to this number. Standard message and data rates may apply, and you can reply STOP any time. Is that okay?" | Rule: verbal SMS consent, asked once, before the first text of the call. The `sms_consent_ask` line from the rules, word for word. The recording is the record of consent, which is what carriers ask for at A2P registration. On a no, nothing is sent all call. |
+| Caller: "Yeah, that's fine." | |
+| Agent: "Great, sending it now, and I can get someone booked while we're on the line. Let me check the schedule." | Tool call `send_quote` with job type, severity, summary. n8n picks the band from the rules file, sends the SMS, stores the quote. Then tool call `get_availability` with urgency routine; n8n asks Cal.com for open slots. |
 | Agent: "I've got tomorrow between 9 and 11, or Monday between 1 and 3. Either work?" | Rule: offer booking proactively after the quote. |
 | Caller: "Tomorrow morning is good." | |
 | Agent: "Booked, tomorrow 9 to 11. You'll get a confirmation text in a second." | Tool call `book_slot`. Cal.com creates the booking, n8n sends the confirmation SMS. |
@@ -49,7 +51,7 @@ Texts: preliminary quote, booking confirmation, wrap-up summary, scheduled follo
 6. Quote inside the rules-file band for the job type.
 7. Booking offered without prompting.
 8. Policy question answered from the rules file without inventing policy.
-9. STOP line in the closing.
+9. STOP line in the closing, and verbal SMS consent asked before the first text. (The consent half is not gradeable until step 3 sends a text; the eval case is owed then.)
 10. Summary text sent within a minute of hangup.
 
 ## Could go wrong (test variants to write)
