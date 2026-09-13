@@ -96,4 +96,4 @@ The eval set for a step is written before the step is built.
 ## Open decisions
 
 - Is Dry Run Plumbing a one-person shop with one on-call number, or a small crew? Affects the availability model and the on-call section of the rules file.
-- Twilio: the Canadian number is provisioned and voice works. The A2P 10DLC campaign was submitted 2026-09-13 and is in carrier review; brand is 1260794 B.C. LTD, with Dry Run Plumbing named in the campaign as the product, not a DBA. No SMS or MMS sends until it is approved, so steps 2 through 5 are gated on it. Voice testing is unaffected.
+- Twilio: the Canadian number is provisioned and voice works. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked and steps 2 through 5 are no longer gated. Twilio credentials live in `.env`.

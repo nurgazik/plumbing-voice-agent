@@ -2,6 +2,7 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-13 A2P campaign approved. Steps 2 through 5 are unblocked. Twilio live credentials and the on-call test number (Ray's own mobile, for now) are in `.env`; the Twilio test-account credentials are unused because the sandbox cannot send real messages.
 - 2026-09-13 A2P campaign submitted and in review for the Canadian number, brand 1260794 B.C. LTD. The campaign description leads with the legal entity and names Dry Run Plumbing as the product, because a DBA would have to be a real registered trade name. Text-in opt-in keywords are deliberately blank: declaring them made the checker demand a published text-in call-to-action that does not exist.
 - 2026-09-13 `compliance.sms_footer` still carries a placeholder address and phone. CASL wants a real mailing address and the sending entity on every commercial text, so it needs the 1260794 B.C. LTD details before step 3 sends anything.
 - 2026-09-13 The consent ask is ~60 words, well over the 40-word turn budget, because A2P vetting rejected the short version: the spoken script itself has to name the business, the message types, the frequency, the rates disclaimer, and STOP. Treated like a safety instruction, exempt from the budget.
