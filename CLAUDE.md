@@ -20,7 +20,7 @@ The loop: rules load into the prompt, the agent calls a tool, n8n does the work 
 
 ## Stack
 
-Twilio (Canadian number, SMS, MMS), Retell (BYOK, Anthropic key), Anthropic API (Haiku for turns, Sonnet for reasoning and vision), n8n Cloud, Supabase, Cal.com, HubSpot free CRM, Vercel + Next.js (landing page, later the quote page), Langfuse (traces), Promptfoo (evals), Retell simulation testing.
+Twilio (Canadian number, SMS, MMS), Retell (built-in Claude Haiku, billed by Retell; BYOK is unsupported for the built-in LLM), Anthropic API (Haiku for turns, Sonnet for reasoning and vision), n8n Cloud, Supabase, Cal.com, HubSpot free CRM, Vercel + Next.js (landing page, later the quote page), Langfuse (traces), Promptfoo (evals), Retell simulation testing.
 
 ## The spec
 
@@ -78,10 +78,12 @@ web/                      Next.js landing page (later)
 
 Spoken recording disclosure. AI disclosure on request and in the opener. CASL opt-out on every text (STOP). Document US data routing (Retell, Anthropic, n8n, Supabase regions) in `docs/architecture.md`.
 
+Verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask` in the rules file. It is registered with the carriers and published at nurgazy.com/dryrunplumbing/sms; those three must stay identical. The public privacy policy, terms, and opt-in pages are listed in `docs/compliance-pages.md`. `compliance.sms_footer` is still placeholder text and needs the real entity and mailing address before step 3 sends anything.
+
 ## Build order and status
 
 1. Answer in character with disclosures, two triage questions, name and address. No tools. Tested via Retell web call. (current)
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool.
+2. Photo loop: MMS in, vision, `get_photo_analysis` tool. Needs A2P approval.
 3. Quote via `send_quote`.
 4. Booking via `get_availability` and `book_slot` (Cal.com).
 5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
@@ -94,4 +96,4 @@ The eval set for a step is written before the step is built.
 ## Open decisions
 
 - Is Dry Run Plumbing a one-person shop with one on-call number, or a small crew? Affects the availability model and the on-call section of the rules file.
-- Twilio Canadian number is under regulatory review. Until it clears, test via Retell web calls.
+- Twilio: the Canadian number is provisioned and voice works. The A2P 10DLC campaign was submitted 2026-09-13 and is in carrier review; brand is 1260794 B.C. LTD, with Dry Run Plumbing named in the campaign as the product, not a DBA. No SMS or MMS sends until it is approved, so steps 2 through 5 are gated on it. Voice testing is unaffected.
