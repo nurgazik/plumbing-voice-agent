@@ -1,5 +1,7 @@
 # Beats 2 through 6 of the emergency call. Escalation tool beats come in step 7.
 - description: Water spraying and local taps are stuck, safety instruction comes first
+  metadata:
+    beats: [EC-2, EC-3, EC-4, EC-5]
   vars:
     max_words: 110
     conversation:
@@ -20,6 +22,8 @@
       value: "photo"
 
 - description: Running water, no shutoff question asked yet, first turn
+  metadata:
+    beats: [EC-2, IC-3]
   vars:
     conversation:
       - role: user
@@ -29,6 +33,8 @@
       value: The reply treats the running water as answered and does not ask whether it is a drip. It asks one question or gives one instruction about a shutoff valve the caller can reach. It does not ask for a name, address, or photo, and does not mention a price.
 
 - description: Gas smell ends everything else
+  metadata:
+    beats: [EC-2, EC-4, EC-5]
   vars:
     max_words: 110
     conversation:
@@ -43,6 +49,8 @@
       value: "photo"
 
 - description: Water stopped by the shutoff at 2 am, no same-night promise
+  metadata:
+    beats: [IC-3, EC-8]
   vars:
     conversation:
       - role: user
@@ -52,3 +60,62 @@
       value: The reply recognises the water is stopped and does not treat this as a tonight-emergency. It does not promise anyone will come out tonight and does not promise a callback within 15 minutes. It reassures the caller in a sentence and asks one intake question, such as their name, or says a plumber will call back about the next open slot.
     - type: not-contains
       value: "$"
+
+# Emergency intake and close. Step 1 has no escalate tool, so the agent promises
+# the callback from the rules and closes; the tool call itself is graded at step 7.
+- description: Water is off, intake starts with the name only
+  metadata:
+    beats: [EC-6, IC-2, EC-4, EC-5]
+  vars:
+    conversation:
+      - role: user
+        content: "There's water everywhere, a pipe behind the washer just went and it's spraying."
+      - role: assistant
+        content: "Okay, first thing, let's get the water off. Is there a shutoff valve behind the washer you can reach, usually two small taps where the hoses connect?"
+      - role: user
+        content: "They're stuck, I can't turn them."
+      - role: assistant
+        content: "Then go to the main shutoff for the house. It's usually where the water line comes in, near the water meter, in the basement or garage. Turn it clockwise until it stops. I'll stay on the line."
+      - role: user
+        content: "Okay... found it... it's off. It's slowing down."
+  assert:
+    - type: llm-rubric
+      value: The reply acknowledges the water is off, tells the caller to keep it off, and asks for exactly one thing, the caller's name. It does not ask for the address or phone number in the same turn, does not ask for a photo, and does not state a repair price.
+    - type: not-icontains
+      value: "photo"
+    - type: not-contains
+      value: "$"
+
+- description: Emergency close promises the 15-minute callback and the STOP line
+  metadata:
+    beats: [EC-8, EC-10, EC-5]
+  vars:
+    max_words: 90
+    conversation:
+      - role: user
+        content: "There's water everywhere, a pipe behind the washer just went and it's spraying."
+      - role: assistant
+        content: "Okay, first thing, let's get the water off. Is there a shutoff valve behind the washer you can reach?"
+      - role: user
+        content: "They're stuck. Okay I went to the main, it's off now."
+      - role: assistant
+        content: "Good. Keep it off. I'm going to get our on-call plumber to call you right now. Can I confirm your name?"
+      - role: user
+        content: "Jordan Park."
+      - role: assistant
+        content: "Thanks Jordan. And the address?"
+      - role: user
+        content: "5510 Oak Street, Vancouver, it's a house."
+      - role: assistant
+        content: "Is this the best number to call you back on?"
+      - role: user
+        content: "Yes. So what happens now?"
+  assert:
+    - type: icontains
+      value: "15 minutes"
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: llm-rubric
+      value: The reply says the on-call plumber will call back within 15 minutes and tells the caller to keep the water off. It may mention that an after-hours callout fee applies, but must NOT state a repair price or range. It does not ask for a photo. It includes the opt-out line. It asks no further question.
+    - type: not-icontains
+      value: "photo"

@@ -1,5 +1,7 @@
 # Beat 9. Step 1 closes after intake with a callback promise, no booking yet.
 - description: Close includes the STOP line verbatim
+  metadata:
+    beats: [IC-9, EC-8]
   vars:
     conversation:
       - role: user

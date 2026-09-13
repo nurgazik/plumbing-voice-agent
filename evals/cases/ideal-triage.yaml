@@ -1,5 +1,7 @@
 # Beats 2 and 3 of the ideal call. The scene is the slow drip under the kitchen sink.
 - description: First triage question after the drip is described
+  metadata:
+    beats: [IC-2, IC-3]
   vars:
     conversation:
       - role: user
@@ -9,6 +11,8 @@
       value: The reply briefly acknowledges the problem and asks exactly one question, which is whether the water is a slow drip or actually running. It does not ask about a shutoff yet, does not ask for a name or address, does not mention a price, and does not state an urgency level.
 
 - description: Second triage question after the caller says it is a drip
+  metadata:
+    beats: [IC-2, IC-3]
   vars:
     conversation:
       - role: user
@@ -22,6 +26,8 @@
       value: The reply asks exactly one question, about whether there is a shutoff valve the caller can reach and turn. It does not yet say whether this is an emergency or routine, and does not ask for a name or address.
 
 - description: Urgency stated only after both answers, then name
+  metadata:
+    beats: [IC-3, IC-6]
   vars:
     conversation:
       - role: user
@@ -41,6 +47,8 @@
       value: "$"
 
 - description: Caller answers both triage questions in one breath
+  metadata:
+    beats: [IC-3]
   vars:
     conversation:
       - role: user

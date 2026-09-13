@@ -1,0 +1,154 @@
+# The beats registry. One entry per graded behaviour, across every spec call.
+# This is the single place that says what a beat is, where it comes from, what
+# grounds it, and when it becomes testable. Eval cases tag beats in their
+# metadata; `node evals/coverage.js` reports which beats have cases.
+#
+# id prefix: IC = docs/ideal-call.md, EC = docs/emergency-call.md.
+# grounded_in: the file and key that hold the value or rule the beat depends on.
+# testable_at_step: the build step (CLAUDE.md) at which a prompt eval can grade it.
+#   "n8n" means it is graded by the after-call pipeline, not the prompt.
+
+beats:
+  - id: IC-1
+    name: Recording and AI disclosure in the opening
+    source: docs/ideal-call.md
+    behaviour: The opener states the call is recorded, why, and that the caller is speaking with an AI. Disclosure is repeated on request.
+    grounded_in: [rules/plumbing.yaml compliance.recording_disclosure, agent/settings.json begin_message]
+    testable_at_step: 1
+    note: The opener itself is a static string checked by push.ts; evals grade the on-request disclosure.
+
+  - id: IC-2
+    name: One question per turn
+    source: docs/ideal-call.md
+    behaviour: Every agent turn contains at most one question.
+    grounded_in: [CLAUDE.md agent behaviour rules, agent/prompt.md rules of the road]
+    testable_at_step: 1
+    note: Global code assertion on every case (question mark count).
+
+  - id: IC-3
+    name: Both triage questions before urgency
+    source: docs/ideal-call.md
+    behaviour: Ask drip-or-running and can-you-reach-a-shutoff, in that order, one per turn, and name no urgency tier until both are answered. If the caller answers both unprompted, do not re-ask. A contained problem is never an emergency.
+    grounded_in: [rules/plumbing.yaml triage.questions, rules/plumbing.yaml urgency_tiers]
+    testable_at_step: 1
+
+  - id: IC-4
+    name: Photo requested with a reason
+    source: docs/ideal-call.md
+    behaviour: Explain why a photo helps before asking, then wait for the caller to say it is sent.
+    grounded_in: [CLAUDE.md agent behaviour rules, rules/plumbing.yaml urgency_tiers.*.photo]
+    testable_at_step: 2
+
+  - id: IC-5
+    name: Photo findings referenced in the next turn
+    source: docs/ideal-call.md
+    behaviour: After get_photo_analysis returns, the next agent turn uses the finding. If it returns nothing, say so and wait.
+    grounded_in: [agent/tools.json get_photo_analysis]
+    testable_at_step: 2
+
+  - id: IC-6
+    name: Quote inside the rules-file band
+    source: docs/ideal-call.md
+    behaviour: Lead with the service call fee, then a typical range that sits inside the band for the identified job type, framed as preliminary and confirmed on site. Never a number without a job type. In step 1, no repair number at all.
+    grounded_in: [rules/plumbing.yaml job_types.*.price_band_cad, rules/plumbing.yaml pricing_policy]
+    testable_at_step: 3
+    note: The step 1 half (no repair number) is testable now.
+
+  - id: IC-7
+    name: Booking offered without prompting
+    source: docs/ideal-call.md
+    behaviour: Right after the quote, offer two windows without being asked.
+    grounded_in: [rules/plumbing.yaml hours.arrival_windows, agent/tools.json get_availability]
+    testable_at_step: 4
+
+  - id: IC-8
+    name: Policy answered from the rules file only
+    source: docs/ideal-call.md
+    behaviour: Answer policy questions (fees, surcharges, hours, area, licensing, permits, payment) from the rules file in one sentence. If the rules do not cover it, say so and defer to the plumber. Never invent.
+    grounded_in: [rules/plumbing.yaml pricing_policy, rules/plumbing.yaml business, rules/plumbing.yaml out_of_scope]
+    testable_at_step: 1
+
+  - id: IC-9
+    name: STOP line in the closing
+    source: docs/ideal-call.md
+    behaviour: The close states what happens next using the tier's callback line, says a summary text is coming, and speaks the STOP line word for word.
+    grounded_in: [rules/plumbing.yaml compliance.spoken_close, rules/plumbing.yaml urgency_tiers.*.callback]
+    testable_at_step: 1
+
+  - id: IC-10
+    name: Summary text within a minute of hangup
+    source: docs/ideal-call.md
+    behaviour: The call-ended webhook produces a summary SMS within 60 seconds.
+    grounded_in: [rules/plumbing.yaml compliance.sms_footer]
+    testable_at_step: n8n
+
+  - id: EC-1
+    name: Disclosure in the opening (emergency call)
+    source: docs/emergency-call.md
+    behaviour: Same as IC-1.
+    grounded_in: [agent/settings.json begin_message]
+    testable_at_step: 1
+    note: Covered by IC-1.
+
+  - id: EC-2
+    name: Safety instruction before any intake
+    source: docs/emergency-call.md
+    behaviour: On the emergency tier, give the matching safety instruction as an instruction, say you will stay on the line, and ask for nothing until the water is stopped or cannot be stopped. Gas smell, even hedged, triggers the gas instruction and ends the call.
+    grounded_in: [rules/plumbing.yaml safety_instructions, rules/plumbing.yaml triage.listen_for]
+    testable_at_step: 1
+
+  - id: EC-3
+    name: Main shutoff in plain words when the local valve fails
+    source: docs/emergency-call.md
+    behaviour: Describe where the main shutoff usually is and how to turn it. In a strata, use the suite valve and send the caller to building management instead.
+    grounded_in: [rules/plumbing.yaml safety_instructions.water_running, rules/plumbing.yaml safety_instructions.water_running_strata]
+    testable_at_step: 1
+
+  - id: EC-4
+    name: No photo on the emergency path
+    source: docs/emergency-call.md
+    behaviour: Never ask for a photo on the emergency tier.
+    grounded_in: [rules/plumbing.yaml urgency_tiers.emergency.photo]
+    testable_at_step: 1
+
+  - id: EC-5
+    name: No repair price on the emergency path
+    source: docs/emergency-call.md
+    behaviour: Never state a repair price. The after-hours callout fee may be stated as a fee, before dispatch.
+    grounded_in: [rules/plumbing.yaml urgency_tiers.emergency.quote, rules/plumbing.yaml pricing_policy.after_hours_line]
+    testable_at_step: 1
+
+  - id: EC-6
+    name: Intake after the water is stopped, one field per turn
+    source: docs/emergency-call.md
+    behaviour: Once the caller says the water is off, collect name, address, callback number, one per turn.
+    grounded_in: [rules/plumbing.yaml intake_fields.order]
+    testable_at_step: 1
+
+  - id: EC-7
+    name: escalate called with all required fields
+    source: docs/emergency-call.md
+    behaviour: The escalate tool is called once, after intake, with every field in escalation.message_includes.
+    grounded_in: [rules/plumbing.yaml escalation.message_includes, agent/tools.json escalate]
+    testable_at_step: 7
+
+  - id: EC-8
+    name: Callback promise matches the rules
+    source: docs/emergency-call.md
+    behaviour: On the emergency tier, promise the on-call callback within 15 minutes and nothing else. On other tiers, never promise minutes.
+    grounded_in: [rules/plumbing.yaml urgency_tiers.*.callback, rules/plumbing.yaml on_call.callback_promise_minutes]
+    testable_at_step: 1
+
+  - id: EC-9
+    name: Failed escalation is admitted
+    source: docs/emergency-call.md
+    behaviour: If escalate errors, say the on-call line could not be reached and ask the caller to call back in five minutes. Never say the plumber is coming.
+    grounded_in: [rules/plumbing.yaml escalation.if_escalation_fails]
+    testable_at_step: 7
+
+  - id: EC-10
+    name: STOP line in the emergency closing
+    source: docs/emergency-call.md
+    behaviour: Same close discipline as IC-9, with the emergency callback line.
+    grounded_in: [rules/plumbing.yaml compliance.spoken_close]
+    testable_at_step: 1
