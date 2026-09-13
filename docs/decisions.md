@@ -2,6 +2,8 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-13 Privacy policy and terms live in the portfolio site repo at nurgazy.com/dryrunplumbing/privacy and /terms, not in `web/`, because the A2P brand is registered to Ray personally and a matching domain reads better to a vetting reviewer. `docs/compliance-pages.md` has the pointer.
+- 2026-09-13 The public pages promise 90-day deletion of recordings, transcripts, and photos. That is a commitment with no implementation yet; a deletion job is owed in the n8n layer once Supabase is live.
 - 2026-09-12 Retell's built-in Claude 4.5 Haiku, billed by Retell, instead of BYOK. Retell support confirms BYOK is unsupported for the built-in LLM; the alternative is a custom LLM websocket server, which is out of scope. CLAUDE.md's "BYOK" line should be updated.
 - 2026-09-12 The opener is a literal string in `agent/settings.json` (Retell begin_message), checked at push time for the words "recorded" and "AI assistant", so the disclosures are verbatim and cannot drift with the prompt.
 - 2026-09-12 push.ts has no dependencies and runs on Node's built-in TypeScript support; schema validation of the rules file is skipped until js-yaml and ajv are added as devDependencies (asked, not added).

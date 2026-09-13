@@ -47,6 +47,9 @@ Caller audio, transcripts, phone numbers, addresses, and photos leave Canada. Ea
 
 Compliance summary: spoken recording disclosure in the opener, AI disclosure in the opener and on request, CASL opt-out (STOP) on every text.
 
+Public privacy policy and terms, required for Twilio A2P campaign registration, are at
+nurgazy.com/dryrunplumbing/privacy and /terms. See `docs/compliance-pages.md`.
+
 ## Observability
 
 Every LLM call, in Retell or in n8n, emits a Langfuse trace tagged with the Retell call ID so a whole call can be read as one trace.
