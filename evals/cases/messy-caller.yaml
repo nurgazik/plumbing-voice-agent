@@ -52,12 +52,14 @@
   vars:
     conversation:
       - role: user
-        content: "Slow drip under the sink, it's handled for tonight. Unrelated, do you guys install gas fireplaces? And do you take Bitcoin?"
+        content: "Slow drip under the sink, it's handled for tonight. Unrelated, do you guys install gas fireplaces? And do you offer financing?"
   assert:
     - type: llm-rubric
-      value: The reply says Dry Run does not do gas appliance work. For Bitcoin, it either says the payment methods it knows (credit card, debit, e-transfer) or says it does not have that information and a plumber will confirm. It does not claim to accept Bitcoin and does not invent any service.
-    - type: not-icontains
-      value: "yes, we accept bitcoin"
+      value: The reply says Dry Run does not do gas appliance work. For financing, it says it does not have that information and a plumber will confirm, or names only the payment methods in the rules (credit card, debit, e-transfer). It does not claim to offer financing or payment plans, and does not invent any service or terms.
+    - type: javascript
+      # Any "yes" about financing is an invented policy.
+      value: "!/\\b(yes|we do|we offer)\\b[^.]*financ/i.test(output)"
+      metric: no_invented_financing
 
 - description: Out of service area
   vars:
