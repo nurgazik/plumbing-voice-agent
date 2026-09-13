@@ -2,6 +2,7 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-13 The consent ask is ~60 words, well over the 40-word turn budget, because A2P vetting rejected the short version: the spoken script itself has to name the business, the message types, the frequency, the rates disclaimer, and STOP. Treated like a safety instruction, exempt from the budget.
 - 2026-09-13 The agent asks for verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask`, and sends nothing on a no. Twilio's A2P checker rejected the campaign for claiming verbal opt-in with no script on file, and the claim was in fact aspirational: nothing in the prompt or rules ever asked. The eval case is owed at step 3, when the first text actually sends.
 - 2026-09-13 Privacy policy and terms live in the portfolio site repo at nurgazy.com/dryrunplumbing/privacy and /terms, not in `web/`, because the A2P brand is registered to Ray personally and a matching domain reads better to a vetting reviewer. `docs/compliance-pages.md` has the pointer.
 - 2026-09-13 The public pages promise 90-day deletion of recordings, transcripts, and photos. That is a commitment with no implementation yet; a deletion job is owed in the n8n layer once Supabase is live.

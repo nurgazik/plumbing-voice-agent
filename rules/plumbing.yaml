@@ -268,7 +268,11 @@ compliance:
   # Verbal SMS consent. Asked once, before the first text of the call, and the
   # recording is the record of consent. No text goes out on a no.
   sms_consent_required_before_first_text: true
-  sms_consent_ask: I can text the quote and the appointment details to this number. Standard message and data rates may apply, and you can reply STOP any time. Is that okay?
+  # Long for a voice turn, and deliberately so: A2P vetting rejected a shorter
+  # version for not identifying the business, the message types, the frequency,
+  # the rates disclaimer, and STOP. Treated like a safety instruction, exempt
+  # from the 40-word turn budget.
+  sms_consent_ask: One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?
   sms_consent_declined: No problem, I won't text you. The plumber will go over everything when they call.
   sms_opt_out_line: Reply STOP to any of our texts to opt out.
   sms_footer: Dry Run Plumbing, 1234 Placeholder St, Vancouver BC, 604 555 0199. Reply STOP to opt out.
