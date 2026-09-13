@@ -1,0 +1,6 @@
+{
+  "_comment": "Model settings for the Retell agent. push.ts reads this; evals/promptfooconfig.yaml mirrors it and must be kept in sync by hand.",
+  "model": "claude-haiku-4-5-20251001",
+  "temperature": 0.1,
+  "max_tokens": 300
+}

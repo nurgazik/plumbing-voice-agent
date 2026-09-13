@@ -2,6 +2,8 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-12 Agent temperature is 0.1, set in `agent/settings.json` and mirrored in the eval config. At 0.3 the suite hovered between 94 and 100% run to run; steadier turns matter more than variety on a phone call. Ray confirmed.
+- 2026-09-12 Keep the phone price band (photo to quote loop) over the industry fee-only script. Ray confirmed; the fee-first framing in `pricing_policy` makes it defensible.
 - 2026-09-12 Rules file v2 is grounded in a survey of Metro Vancouver shops, dispatch scripts, and BC regulators; see `docs/plumbing-research.md`. Values are fictional but shaped like the real thing.
 - 2026-09-12 Keep the phone price band even though no real shop quotes one; the agent now leads with the service call fee and calls the band a typical range confirmed on site, which is the honest middle and satisfies BC's estimate rule.
 - 2026-09-12 Dry Run is deliberately not a gas contractor. Many Vancouver plumbers are, but it keeps the demo's escalation path single-purpose. Gas smell uses FortisBC's wording and number.

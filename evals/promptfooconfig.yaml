@@ -7,9 +7,10 @@ prompts:
 providers:
   - id: anthropic:messages:claude-haiku-4-5-20251001
     label: haiku-turns
+    # Mirrors agent/settings.json. Change both together.
     config:
       max_tokens: 300
-      temperature: 0.3
+      temperature: 0.1
 
 defaultTest:
   options:
@@ -33,7 +34,7 @@ tests:
   - file://cases/*.yaml
 
 evaluateOptions:
-  # Every case runs twice at the real temperature. A flaky turn is a failing turn.
+  # Every case runs twice at the deployed temperature. A flaky turn is a failing turn.
   repeat: 2
 
 outputPath: output/latest.json
