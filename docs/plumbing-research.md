@@ -8,7 +8,7 @@ Observed. Upfront flat-rate after on-site diagnosis is the dominant model (Gator
 
 Rules file. Flat-rate model, $120 service fee waived on approval, $199 after-hours callout, no weekend surcharge for booked visits, bands set from the guide ranges above, big-ticket items (heaters, repiping, sewer, mains) in writing only.
 
-Where we differ. No real shop gives a repair price range by phone. The scripted deflection everywhere is "the service fee is $X, applied to the repair; the tech quotes a flat rate before work starts." The golden call quotes a band from a photo. We keep the band because it is the demo's point, but the agent now leads with the service fee and calls the band a typical range confirmed on site. BC's consumer protection act (BPCPA s.4(3)(c)) makes an estimate materially below the final price a deceptive practice unless the customer consents first, so the quote line says the plumber won't go above it without the caller's okay.
+Where we differ. No real shop gives a repair price range by phone. The scripted deflection everywhere is "the service fee is $X, applied to the repair; the tech quotes a flat rate before work starts." The ideal call quotes a band from a photo. We keep the band because it is the demo's point, but the agent now leads with the service fee and calls the band a typical range confirmed on site. BC's consumer protection act (BPCPA s.4(3)(c)) makes an estimate materially below the final price a deceptive practice unless the customer consents first, so the quote line says the plumber won't go above it without the caller's okay.
 
 ## Intake and triage
 
@@ -52,9 +52,9 @@ Rules file. Seasonal section with an honest surge notice, a frozen-versus-burst 
 
 Not changed here; these are the spec owner's call.
 
-- golden-call.md opener: add the recording purpose. "this call is recorded for quality and to help with your quote, and you're speaking with an AI assistant."
-- golden-call.md quote turn: lead with the service fee, then the range. "There's a $120 service call fee, waived if you go ahead. A repair like this usually runs $175 to $350 all in..."
-- golden-call.md Sunday booking: hours now say weekend booked visits at regular rate, which the spec's "Sunday morning is our regular rate" already implies.
+- ideal-call.md opener: add the recording purpose. "this call is recorded for quality and to help with your quote, and you're speaking with an AI assistant."
+- ideal-call.md quote turn: lead with the service fee, then the range. "There's a $120 service call fee, waived if you go ahead. A repair like this usually runs $175 to $350 all in..."
+- ideal-call.md Sunday booking: hours now say weekend booked visits at regular rate, which the spec's "Sunday morning is our regular rate" already implies.
 - emergency-call.md callout fee: state the $199 amount on the call, not "Sam will confirm the amount." BC consumer law wants fees disclosed with the same prominence as the rate, before commitment.
 - emergency-call.md: add "is this a house or a condo?" before the main-shutoff instruction, because in a strata the caller should not touch the building main.
 

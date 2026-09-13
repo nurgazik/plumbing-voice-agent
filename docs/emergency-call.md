@@ -1,6 +1,6 @@
 # Emergency call
 
-The second test case. It defines the escalation path. Same format as the golden call: left column is an ideal exchange, right column is what the system does. Evals grade the beats at the bottom, not the wording.
+The second test case. It defines the escalation path. Same format as the ideal call: left column is an ideal exchange, right column is what the system does. Evals grade the beats at the bottom, not the wording.
 
 Scene: Tuesday, 2:10 am. Returning caller (called once before about a faucet). A pipe has split behind the washing machine and water is running across the laundry room floor.
 
@@ -39,7 +39,7 @@ If the washer taps turn, the water stops, and nothing is still running, the tier
 
 Tool: `escalate`.
 
-Webhooks: same three as the golden call.
+Webhooks: same three as the ideal call.
 
 Tables touched: callers (existing row), calls, escalations, follow-ups.
 

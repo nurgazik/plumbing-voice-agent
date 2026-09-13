@@ -11,7 +11,7 @@ One line per decision, dated, newest first. Non-obvious calls only.
 - 2026-09-12 Rules file v2 is grounded in a survey of Metro Vancouver shops, dispatch scripts, and BC regulators; see `docs/plumbing-research.md`. Values are fictional but shaped like the real thing.
 - 2026-09-12 Keep the phone price band even though no real shop quotes one; the agent now leads with the service call fee and calls the band a typical range confirmed on site, which is the honest middle and satisfies BC's estimate rule.
 - 2026-09-12 Dry Run is deliberately not a gas contractor. Many Vancouver plumbers are, but it keeps the demo's escalation path single-purpose. Gas smell uses FortisBC's wording and number.
-- 2026-09-12 Weekend booked visits run at the regular rate, because the golden call books a Sunday morning and says so; the v1 rules had Sunday closed, which contradicted the spec.
+- 2026-09-12 Weekend booked visits run at the regular rate, because the ideal call books a Sunday morning and says so; the v1 rules had Sunday closed, which contradicted the spec.
 - 2026-09-12 The agent may state fees (service call, after-hours callout) on request but never a repair number in step 1; the firm-price eval allows the digits 120 only.
 - 2026-09-12 Every eval case runs twice at the real temperature (0.3), because the first single-pass run hid three real agent gaps that only showed on a second roll. A flaky turn is a failing turn.
 - 2026-09-12 Callback promise is a per-tier `callback` line in the rules file, after the first eval run caught the agent promising the emergency-only 15-minute callback for a routine drip.

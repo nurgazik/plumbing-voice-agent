@@ -24,7 +24,7 @@ Twilio (Canadian number, SMS, MMS), Retell (BYOK, Anthropic key), Anthropic API 
 
 ## The spec
 
-`docs/golden-call.md` is the spec. It is the one call we want, written as a two-column transcript (what is said, what the system does), plus the ten beats an eval grades. Evals grade behaviour, not wording. `docs/emergency-call.md` is the second test case and defines the escalation path. Read both before touching the prompt, tools, or schema.
+`docs/ideal-call.md` is the spec. It is the one call we want, written as a two-column transcript (what is said, what the system does), plus the ten beats an eval grades. Evals grade behaviour, not wording. `docs/emergency-call.md` is the second test case and defines the escalation path. Read both before touching the prompt, tools, or schema.
 
 ## Repo layout
 
@@ -34,7 +34,7 @@ README.md
 .env.example              every key named, no values; .env is gitignored
 docs/
   architecture.md
-  golden-call.md
+  ideal-call.md
   emergency-call.md
   decisions.md            one line per decision, dated, newest first
 rules/
@@ -48,7 +48,7 @@ workflows/                n8n exports, one JSON per workflow, committed after ev
 supabase/migrations/      schema as SQL via Supabase CLI
 evals/
   promptfooconfig.yaml
-  cases/                  golden call, emergency, messy-caller variants
+  cases/                  ideal call, emergency, messy-caller variants
   fixtures/               the test photo
 web/                      Next.js landing page (later)
 ```
@@ -62,7 +62,7 @@ web/                      Next.js landing page (later)
 - Prompt changes run the eval suite before being pushed.
 - Record every non-obvious decision in `docs/decisions.md` in one line.
 
-## Agent behaviour rules (from the golden call review)
+## Agent behaviour rules (from the ideal call review)
 
 - Open with the recording disclosure and the AI disclosure, verbatim.
 - One question per turn on voice.

@@ -1,4 +1,4 @@
-# Golden call
+# Ideal call
 
 The one call we want. Not a script the agent recites. The left column shows an ideal exchange; the right column shows what the system does at that moment. Evals grade the ten beats at the bottom, not the wording.
 

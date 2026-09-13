@@ -6,7 +6,7 @@ The plumbing persona is the costume. The product is a rules-driven intake agent 
 
 Built with Retell, Claude, n8n, Supabase, Twilio, Cal.com, and HubSpot. Evals in Promptfoo, traces in Langfuse.
 
-Start with `CLAUDE.md` for the shape of the project, `docs/golden-call.md` for the one call we want, and `docs/emergency-call.md` for the escalation path.
+Start with `CLAUDE.md` for the shape of the project, `docs/ideal-call.md` for the one call we want, and `docs/emergency-call.md` for the escalation path.
 
 ## Pushing the agent to Retell
 
