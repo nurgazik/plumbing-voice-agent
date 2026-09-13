@@ -2,6 +2,10 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-12 Retell's built-in Claude 4.5 Haiku, billed by Retell, instead of BYOK. Retell support confirms BYOK is unsupported for the built-in LLM; the alternative is a custom LLM websocket server, which is out of scope. CLAUDE.md's "BYOK" line should be updated.
+- 2026-09-12 The opener is a literal string in `agent/settings.json` (Retell begin_message), checked at push time for the words "recorded" and "AI assistant", so the disclosures are verbatim and cannot drift with the prompt.
+- 2026-09-12 push.ts has no dependencies and runs on Node's built-in TypeScript support; schema validation of the rules file is skipped until js-yaml and ajv are added as devDependencies (asked, not added).
+- 2026-09-12 Voice is cartesia-Emily (calm, middle-aged, American) as a starting point; change it in `agent/settings.json`.
 - 2026-09-12 Agent temperature is 0.1, set in `agent/settings.json` and mirrored in the eval config. At 0.3 the suite hovered between 94 and 100% run to run; steadier turns matter more than variety on a phone call. Ray confirmed.
 - 2026-09-12 Keep the phone price band (photo to quote loop) over the industry fee-only script. Ray confirmed; the fee-first framing in `pricing_policy` makes it defensible.
 - 2026-09-12 Rules file v2 is grounded in a survey of Metro Vancouver shops, dispatch scripts, and BC regulators; see `docs/plumbing-research.md`. Values are fictional but shaped like the real thing.

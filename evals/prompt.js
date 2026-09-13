@@ -1,24 +1,11 @@
-// Renders the agent prompt exactly the way push.ts will: agent/prompt.md with
-// the raw rules YAML dropped into the {{rules}} placeholder. Promptfoo calls
-// this once per test and we return a chat message array.
+// Promptfoo prompt function. Renders the system prompt through agent/render.js
+// (the same path push.ts uses) and appends the scripted conversation.
 //
 // vars.conversation is the transcript so far, as [{role, content}, ...].
 // The last message must be from the caller (role user); the agent's reply is
 // what gets graded.
 
-const fs = require("fs");
-const path = require("path");
-
-const ROOT = path.resolve(__dirname, "..");
-
-function renderSystemPrompt() {
-  const template = fs.readFileSync(path.join(ROOT, "agent", "prompt.md"), "utf8");
-  const rules = fs.readFileSync(path.join(ROOT, "rules", "plumbing.yaml"), "utf8");
-  if (!template.includes("{{rules}}")) {
-    throw new Error("agent/prompt.md has no {{rules}} placeholder");
-  }
-  return template.replace("{{rules}}", rules.trim());
-}
+const { renderSystemPrompt } = require("../agent/render.js");
 
 module.exports = function ({ vars }) {
   const conversation = Array.isArray(vars.conversation) ? vars.conversation : [];
@@ -27,5 +14,3 @@ module.exports = function ({ vars }) {
   }
   return [{ role: "system", content: renderSystemPrompt() }, ...conversation];
 };
-
-module.exports.renderSystemPrompt = renderSystemPrompt;

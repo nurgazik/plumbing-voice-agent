@@ -4,7 +4,7 @@ Three layers, one loop. See CLAUDE.md for the short version.
 
 ## Layers
 
-Conversation: Retell runs the live call (speech to text, turn-taking, text to speech, tool calling). Claude Haiku handles turns, BYOK with the Anthropic key. The rules file is rendered into the prompt at push time, not fetched at call time.
+Conversation: Retell runs the live call (speech to text, turn-taking, text to speech, tool calling). Claude 4.5 Haiku handles turns through Retell's built-in LLM, billed by Retell. Retell does not support bring-your-own-key for its built-in LLM; using our own Anthropic key would mean running a custom LLM websocket server, which is not worth it for this demo. The Anthropic key is used directly by n8n and by the evals. The rules file is rendered into the prompt at push time, not fetched at call time.
 
 Actions: n8n Cloud. Every Retell tool call and every Retell or Twilio webhook lands on an n8n webhook. n8n calls Claude Sonnet for photo analysis, quotes, and summaries, and talks to Cal.com, HubSpot, Twilio SMS, and Supabase.
 
