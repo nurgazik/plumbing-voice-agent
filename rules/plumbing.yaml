@@ -67,7 +67,7 @@ urgency_tiers:
     photo: never
     quote: never
     dispatch: same_night
-    callback: The on-call plumber will call you back within 15 minutes.
+    callback: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
   urgent:
     definition: The problem is contained for now but will get worse within a day, or the household has no hot water, no working toilet, a frozen pipe, or a single fixture unusable.
     triage_signals:
