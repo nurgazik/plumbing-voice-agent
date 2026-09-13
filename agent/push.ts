@@ -58,7 +58,7 @@ function step(msg: string) {
 
 function runEvals(): boolean {
   step("Running the eval suite (evals/promptfooconfig.yaml)");
-  const r = spawnSync("npx", ["--yes", "promptfoo@latest", "eval", "--env-file", ENV_PATH, "--no-cache"], {
+  const r = spawnSync("npx", ["promptfoo", "eval", "--env-file", ENV_PATH, "--no-cache"], {
     cwd: path.join(ROOT, "evals"),
     stdio: ["ignore", "pipe", "pipe"],
     encoding: "utf8",

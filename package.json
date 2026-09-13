@@ -1,0 +1,16 @@
+{
+  "name": "dry-run-plumbing",
+  "private": true,
+  "description": "AI receptionist demo for a fictional plumbing company",
+  "scripts": {
+    "push": "node agent/push.ts",
+    "push:dry": "node agent/push.ts --dry-run",
+    "evals": "cd evals && promptfoo eval --env-file ../.env --no-cache",
+    "evals:view": "cd evals && promptfoo view"
+  },
+  "devDependencies": {
+    "ajv": "^8.20.0",
+    "js-yaml": "^5.4.2",
+    "promptfoo": "^0.123.0"
+  }
+}
