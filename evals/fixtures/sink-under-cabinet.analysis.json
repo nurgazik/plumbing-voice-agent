@@ -1,0 +1,12 @@
+{
+  "found": true,
+  "received_at": "2026-09-14T04:09:57.145+00:00",
+  "analysis": {
+    "fixture": "Under-sink drain pipes (double kitchen sink) with curved trap assembly",
+    "problem": "Photo shows the black drain pipes and curved trap under a double kitchen sink, along with supply lines and hoses; no visible water, dripping, or damage is apparent in the image.",
+    "job_type": "unknown",
+    "confidence": 0.3,
+    "is_plumbing": true,
+    "spoken_summary": "This is a picture of the pipes and curved trap under your kitchen sink, but I don't see any leaking or damage in the photo itself. Can you tell us what's going on so we can pinpoint the issue?"
+  }
+}
