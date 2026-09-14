@@ -113,7 +113,9 @@ async function main() {
       speak_during_execution: t.speak_during_execution,
       speak_after_execution: t.speak_after_execution,
       timeout_ms: settings.tool_timeout_ms,
-      args_at_root: true,
+      // false keeps Retell's full body {name, call, args}. n8n reads the caller's
+      // number from call.from_number, so tools never have to ask the model for it.
+      args_at_root: false,
     })),
   };
 

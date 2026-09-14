@@ -4,15 +4,12 @@
     {
       "name": "get_photo_analysis",
       "built": 2,
-      "description": "Fetch the analysis of the most recent photo the caller texted to this number during this call. Call it only after the caller says the photo is sent. Returns nothing if no photo has arrived yet; if so, tell the caller it has not come through and wait, then try once more.",
+      "description": "Fetch the analysis of the most recent photo the caller texted to this number during this call. Takes no arguments; the caller's number comes with the call. Call it only after the caller says the photo is sent. Returns nothing if no photo has arrived yet; if so, tell the caller it has not come through and wait, then try once more. If it returns nothing a second time, stop trying and move on.",
       "speak_during_execution": true,
       "speak_after_execution": true,
       "parameters": {
         "type": "object",
-        "properties": {
-          "caller_phone": {"type": "string", "description": "Caller's phone number in E.164, from the call metadata."}
-        },
-        "required": ["caller_phone"]
+        "properties": {}
       }
     },
     {
@@ -24,12 +21,31 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "caller_phone": {"type": "string"},
-          "job_type": {"type": "string", "description": "A job_types key from the rules file, for example p_trap_leak."},
-          "severity": {"type": "string", "enum": ["routine", "urgent"]},
-          "summary": {"type": "string", "description": "One sentence describing the problem in the caller's terms."}
+          "caller_phone": {
+            "type": "string"
+          },
+          "job_type": {
+            "type": "string",
+            "description": "A job_types key from the rules file, for example p_trap_leak."
+          },
+          "severity": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "urgent"
+            ]
+          },
+          "summary": {
+            "type": "string",
+            "description": "One sentence describing the problem in the caller's terms."
+          }
         },
-        "required": ["caller_phone", "job_type", "severity", "summary"]
+        "required": [
+          "caller_phone",
+          "job_type",
+          "severity",
+          "summary"
+        ]
       }
     },
     {
@@ -41,10 +57,20 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "urgency": {"type": "string", "enum": ["routine", "urgent"]},
-          "address": {"type": "string"}
+          "urgency": {
+            "type": "string",
+            "enum": [
+              "routine",
+              "urgent"
+            ]
+          },
+          "address": {
+            "type": "string"
+          }
         },
-        "required": ["urgency"]
+        "required": [
+          "urgency"
+        ]
       }
     },
     {
@@ -56,13 +82,30 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "caller_phone": {"type": "string"},
-          "caller_name": {"type": "string"},
-          "address": {"type": "string"},
-          "slot_id": {"type": "string", "description": "The id of the chosen window, as returned by get_availability."},
-          "job_type": {"type": "string"}
+          "caller_phone": {
+            "type": "string"
+          },
+          "caller_name": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "slot_id": {
+            "type": "string",
+            "description": "The id of the chosen window, as returned by get_availability."
+          },
+          "job_type": {
+            "type": "string"
+          }
         },
-        "required": ["caller_phone", "caller_name", "address", "slot_id", "job_type"]
+        "required": [
+          "caller_phone",
+          "caller_name",
+          "address",
+          "slot_id",
+          "job_type"
+        ]
       }
     },
     {
@@ -74,14 +117,43 @@
       "parameters": {
         "type": "object",
         "properties": {
-          "caller_name": {"type": "string"},
-          "callback_number": {"type": "string"},
-          "address": {"type": "string"},
-          "problem_summary": {"type": "string"},
-          "urgency_tier": {"type": "string", "enum": ["emergency", "urgent"]},
-          "shutoff_status": {"type": "string", "enum": ["local_off", "main_off", "cannot_shut_off", "unknown"]}
+          "caller_name": {
+            "type": "string"
+          },
+          "callback_number": {
+            "type": "string"
+          },
+          "address": {
+            "type": "string"
+          },
+          "problem_summary": {
+            "type": "string"
+          },
+          "urgency_tier": {
+            "type": "string",
+            "enum": [
+              "emergency",
+              "urgent"
+            ]
+          },
+          "shutoff_status": {
+            "type": "string",
+            "enum": [
+              "local_off",
+              "main_off",
+              "cannot_shut_off",
+              "unknown"
+            ]
+          }
         },
-        "required": ["caller_name", "callback_number", "address", "problem_summary", "urgency_tier", "shutoff_status"]
+        "required": [
+          "caller_name",
+          "callback_number",
+          "address",
+          "problem_summary",
+          "urgency_tier",
+          "shutoff_status"
+        ]
       }
     }
   ]

@@ -1,0 +1,12 @@
+{
+  "found": true,
+  "received_at": "2026-09-14T04:12:30.000+00:00",
+  "analysis": {
+    "fixture": "P-trap under a single kitchen sink",
+    "problem": "Water droplets and a wet ring at the slip joint where the P-trap meets the tailpiece, with a small puddle on the cabinet floor below.",
+    "job_type": "p_trap_leak",
+    "confidence": 0.85,
+    "is_plumbing": true,
+    "spoken_summary": "It looks like the joint at the P-trap, the curved pipe under the drain, is seeping. Very common and not dangerous. Keep the valve off tonight."
+  }
+}

@@ -1,0 +1,360 @@
+# Beats 4 and 5 of the ideal call, plus the "could go wrong" photo variants.
+# The scene: routine drip, valve off, name and address already given.
+#
+# Turns whose content is a list of blocks replay a tool call that already
+# happened: the assistant's tool_use, then the user's tool_result with what n8n
+# answered. A tool_result content of file://fixtures/... is read from that file
+# by prompt.js. The javascript checks look for the tool_use block promptfoo
+# prints as JSON when the model calls a tool.
+
+- description: Photo asked with a reason, right after the address
+  metadata:
+    beats: [IC-4]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
+      value: "!/\\d{3,}/.test(output)"
+      metric: no_invented_number
+    - type: llm-rubric
+      value: >-
+        The reply asks the caller to text a photo of the leak to this same number, and gives a
+        reason first or alongside (so it can be looked at now, to get a better idea of the problem
+        or the cost before anyone comes out). It contains at most one question. It does not ask for
+        the callback number in the same turn, does not state a price, and does not claim to have
+        seen anything yet.
+    - type: not-contains
+      value: "$"
+
+- description: Agent waits for the caller to say the photo is sent
+  metadata:
+    beats: [IC-4]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Oh, okay, give me a sec, let me find the camera."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
+      value: "!/\\d{3,}/.test(output)"
+      metric: no_invented_number
+    - type: llm-rubric
+      value: >-
+        The reply waits patiently (take your time, or words to that effect). It does not claim to
+        have received or looked at a photo, does not ask for the photo again, does not move on to
+        another intake question, and does not state a price. Zero or one question.
+
+- description: Caller says sent, the tool is called
+  metadata:
+    beats: [IC-5]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+  assert:
+    - type: javascript
+      value: "output.includes('\"name\":\"get_photo_analysis\"')"
+      metric: tool_called
+    - type: not-contains
+      value: "$"
+
+- description: Ambiguous photo is described honestly, no diagnosis, no price
+  metadata:
+    beats: [IC-5, IC-6]
+  vars:
+    max_words: 85   # saying what was and was not seen, then one question, runs a little long
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/sink-under-cabinet.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # The only number allowed is the $120 service call fee from the rules.
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: llm-rubric
+      value: >-
+        The reply uses the photo result honestly: it says it can see the pipes or trap under the
+        sink but cannot see the leak or any damage in the photo itself. It does not name a specific
+        fault or job type as if confirmed, and does not say the photo did not arrive. It may connect
+        the photo to the caller's description of a drip. It does not state any repair price or
+        range, in digits or in words. It ends with at most one question or moves to the next intake
+        step.
+    - type: not-contains
+      value: "$"
+
+- description: Clear photo finding is used in the next turn, no price
+  metadata:
+    beats: [IC-5, IC-6]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: llm-rubric
+      value: >-
+        The reply tells the caller what the photo shows: the joint at the P-trap, the curved pipe
+        under the drain, is the likely source. It reassures in a few words (common, not dangerous)
+        and tells them to keep the valve off. It does not state any repair price or range, in digits
+        or in words. At most one question.
+    - type: not-icontains
+      # Routine tier. "First thing in the morning" is the urgent callback line.
+      value: "first thing in the morning"
+    - type: not-contains
+      value: "$"
+
+- description: Photo has not arrived, agent says so and waits
+  metadata:
+    beats: [IC-5]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: '{"found": false, "message": "No photo has come through from this number yet. Tell the caller it has not arrived and wait, then try once more."}'
+  assert:
+    - type: javascript
+      # Say so and wait; do not retry in the same breath.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
+      value: "!/\\d{3,}/.test(output)"
+      metric: no_invented_number
+    - type: llm-rubric
+      value: >-
+        The reply says the photo has not come through yet on this end, and either asks the caller
+        to check or try once more, or says it will wait. It does not pretend to have seen a photo,
+        does not describe any plumbing, does not state a price, and does not abandon the photo step.
+        At most one question.
+
+- description: Photo never arrives, agent stops after the second try and moves on
+  metadata:
+    beats: [IC-5]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: '{"found": false, "message": "No photo has come through from this number yet. Tell the caller it has not arrived and wait, then try once more."}'
+      - role: assistant
+        content: "Hmm, it hasn't come through on my end yet. Could you try sending it once more?"
+      - role: user
+        content: "Okay, sent it again. It says delivered on my end."
+      - role: assistant
+        content:
+          - type: text
+            text: "Thanks, checking again."
+          - type: tool_use
+            id: toolu_02
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"found": false, "message": "No photo has come through from this number yet. Tell the caller it has not arrived and wait, then try once more."}'
+  assert:
+    - type: javascript
+      # Two tries is the limit. No third call.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
+      value: "!/\\d{3,}/.test(output)"
+      metric: no_invented_number
+    - type: llm-rubric
+      value: >-
+        The reply admits the photo still has not come through and stops trying: it does not ask the
+        caller to send it yet again. It says the plumber will look at it later or on the callback
+        (or words to that effect) and moves on, for example by confirming the callback number or
+        closing. It does not blame the caller, does not describe any plumbing, and does not state a
+        price. At most one question.
+    - type: not-icontains
+      # Routine tier. "First thing in the morning" is the urgent callback line.
+      value: "first thing in the morning"
+    - type: not-contains
+      value: "$"
+
+- description: Caller cannot send a photo, agent moves on without pressure
+  metadata:
+    beats: [IC-4]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Honestly I don't really know how to text a photo from this thing. Can we just skip that?"
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
+      value: "!/\\d{3,}/.test(output)"
+      metric: no_invented_number
+    - type: llm-rubric
+      value: >-
+        The reply accepts the no without pressure: it does not ask for the photo again, does not
+        walk the caller through sending a picture, and does not make the caller feel bad. It moves
+        on to the next intake step, which is confirming the callback number, with exactly one
+        question. It does not state a price.
+    - type: not-contains
+      value: "$"

@@ -1,6 +1,6 @@
 {
   "_comment": "Settings for the Retell agent. push.ts reads this. evals/promptfooconfig.yaml mirrors model and temperature and must be kept in sync by hand. Retell names models differently from Anthropic, hence two model fields.",
-  "build_step": 1,
+  "build_step": 2,
   "agent_name": "Dry Run Plumbing after-hours",
   "model": "claude-haiku-4-5-20251001",
   "retell_model": "claude-4.5-haiku",

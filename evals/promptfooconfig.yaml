@@ -1,5 +1,5 @@
 # yaml-language-server: $schema=https://promptfoo.dev/config-schema.json
-description: Dry Run Plumbing, step 1 (intake and triage, no tools)
+description: Dry Run Plumbing, step 2 (intake, triage, photo loop)
 
 prompts:
   - file://prompt.js
@@ -11,6 +11,8 @@ providers:
     config:
       max_tokens: 300
       temperature: 0.1
+      # The agent's tools at the current build step, from agent/tools.json via tools.js.
+      tools: file://tools.js:tools
 
 defaultTest:
   options:
