@@ -107,7 +107,8 @@ async function main() {
       type: "custom",
       name: t.name,
       description: t.description,
-      url: `${webhookBase}/${t.name}`,
+      // n8n webhook paths are tools/<name-with-hyphens>, see workflows/README.md.
+      url: `${webhookBase}/tools/${t.name.replace(/_/g, "-")}`,
       method: "POST",
       parameters: t.parameters,
       speak_during_execution: t.speak_during_execution,

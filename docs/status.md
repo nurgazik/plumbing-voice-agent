@@ -4,14 +4,14 @@ The one file that changes every session. Read it at session start; update it bef
 
 ## Current step
 
-Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Remaining: fix the tool URL in push.ts, push to Retell, real call with a photo.
+Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Remaining: real call with a photo.
 
 ## Build order
 
 The eval set for a step is written before the step is built.
 
 1. Answer in character with disclosures, two triage questions, name and address. No tools. Done, 38/38 evals.
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Prompt updated to the photo flow, 54/54. Not done: tool wired into the Retell agent, real call. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
+2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Prompt updated to the photo flow, 54/54, pushed to Retell with the tool wired. Not done: real call. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
 3. Quote via `send_quote`.
 4. Booking via `get_availability` and `book_slot` (Cal.com).
 5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
@@ -21,7 +21,7 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- Fix the tool URL in `agent/push.ts`: it builds `<base>/get_photo_analysis` but the n8n webhook path is `tools/get-photo-analysis`. Then `npm run push` (runs the suite first) so `get_photo_analysis` is live on the Retell agent.
+- Ray calls the Twilio number, role-plays the routine drip, texts the sink photo when asked. Expected at step 2: the agent describes the photo with no price, no text is sent, close with the callback line and STOP. Then check Supabase `photos` for the row stamped with `retell_call_id`, and the Langfuse `analyze-photo` trace.
 - Real phone call with a photo, then confirm the Langfuse trace and the `photos.retell_call_id` stamp.
 
 ## Blockers
