@@ -4,7 +4,7 @@ The one file that changes every session. Read it at session start; update it bef
 
 ## Current step
 
-Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Blocker found: the Twilio number has never been connected to Retell for voice, so no call has ever reached the agent. Remaining: run `agent/connect-number.sh`, then the real call with a photo.
+Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Twilio number connected to Retell over a SIP trunk 2026-09-14 (trunk TKa13bad50ff656a7f39aa3c41b274ff1c, Retell number type custom, bound to the agent; `sms_url` still the n8n MMS webhook). Remaining: the real call with a photo.
 
 ## Build order
 
@@ -21,14 +21,13 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- Ray runs `bash agent/connect-number.sh` from the repo root (Claude's sandbox refused it as a production change). It creates the Twilio SIP trunk, moves the number's voice side onto it, imports the number into Retell bound to the agent, and appends the trunk ids and SIP credentials to `.env`. Check the read-back at the end: `sms_url` must still be the n8n MMS webhook.
 - Text a photo to the number first, to confirm MMS still lands in n8n after the trunk change.
 - Ray calls the Twilio number, role-plays the routine drip, texts the sink photo when asked. Expected at step 2: the agent describes the photo with no price, no text is sent, close with the callback line and STOP. Then check Supabase `photos` for the row stamped with `retell_call_id`, and the Langfuse `analyze-photo` trace.
 - Real phone call with a photo, then confirm the Langfuse trace and the `photos.retell_call_id` stamp.
 
 ## Blockers
 
-- Inbound voice: the Twilio number has no voice routing and Retell has no phone number, so calls reach nothing. Fix is `agent/connect-number.sh`, to be run by Ray. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
+None. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
 
 ## Owed before later steps
 
