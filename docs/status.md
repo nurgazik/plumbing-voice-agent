@@ -4,14 +4,14 @@ The one file that changes every session. Read it at session start; update it bef
 
 ## Current step
 
-Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Twilio number connected to Retell over a SIP trunk 2026-09-14 (trunk TKa13bad50ff656a7f39aa3c41b274ff1c, Retell number type custom, bound to the agent; `sms_url` still the n8n MMS webhook). Remaining: the real call with a photo.
+Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Twilio number connected to Retell over a SIP trunk 2026-09-14 (trunk TKa13bad50ff656a7f39aa3c41b274ff1c, Retell number type custom, bound to the agent; `sms_url` still the n8n MMS webhook). First real call 2026-09-14 20:50 UTC: full flow worked, photo used live, photo row stamped with the call id. Step 2 done pending the backlog items below.
 
 ## Build order
 
 The eval set for a step is written before the step is built.
 
 1. Answer in character with disclosures, two triage questions, name and address. No tools. Done, 38/38 evals.
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Prompt updated to the photo flow, 54/54, pushed to Retell with the tool wired. Not done: real call. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
+2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Prompt updated to the photo flow, 54/54, pushed, verified by a real call (Retell call_3eb9dae49c898b7faa8ada35fe6, 2m15s, 27.4 cents on Retell plus 0.9 cents Sonnet vision per photo). Done. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
 3. Quote via `send_quote`.
 4. Booking via `get_availability` and `book_slot` (Cal.com).
 5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
@@ -21,8 +21,10 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- Text a photo to the number first, to confirm MMS still lands in n8n after the trunk change.
-- Ray calls the Twilio number, role-plays the routine drip, texts the sink photo when asked. Expected at step 2: the agent describes the photo with no price, no text is sent, close with the callback line and STOP. Then check Supabase `photos` for the row stamped with `retell_call_id`, and the Langfuse `analyze-photo` trace.
+- Decide step 3 scope and start its eval cases (send_quote by SMS). Prerequisites: real entity and address in `compliance.sms_footer`, the consent ask before the first text, the consent eval case, a `quotes` table, a build script that renders price bands from the rules file into the n8n workflow.
+- Product call for Ray: a slow drip the caller cannot shut off, bucket underneath, was triaged routine by the rules as written. Keep, or make "cannot shut off" urgent?
+- Backlog from the first call: the prompt caps address clarification at one question and photo follow-up at one; Ray's view is that complete data matters more than the count, so relax the caps to "one question per turn, stop when complete". Not changed yet.
+- Observability join, owed at step 5: one `calls` row per call (Retell call id, transcript, recording link, cost, tokens, latency) with photos, quotes, bookings pointing at it; Langfuse traces grouped per call by the Retell call id. Retell's built-in Haiku turns cannot reach Langfuse (no BYOK); they live in Retell's dashboard and public log only.
 - Real phone call with a photo, then confirm the Langfuse trace and the `photos.retell_call_id` stamp.
 
 ## Blockers
