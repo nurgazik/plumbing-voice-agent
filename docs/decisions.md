@@ -2,6 +2,7 @@
 
 One line per decision, dated, newest first. Non-obvious calls only.
 
+- 2026-09-13 Step 2 photo loop verified end to end on Ray's test MMS replayed into n8n: Twilio acknowledged in 0.4 s, photos row done in ~15 s, Langfuse generation `analyze-photo` shows model, 2892 tokens, cost $0.0067, input and structured output. Twilio's messaging service and number now post inbound messages to `/webhook/twilio-inbound-mms`. Known nit: `langfuse.trace.tags` lands in raw attributes instead of tags; fix with the next workflow change.
 - 2026-09-13 n8n workflows are authored as n8n Workflow SDK code in `workflows/*.sdk.ts` and pushed through n8n's instance-level MCP server, because the trial plan has no public API and the SDK form is diffable text where the JSON export is not. Credentials are created by hand in n8n and referenced by name.
 - 2026-09-13 Vision runs as a raw HTTP Request to the Anthropic Messages API (claude-sonnet-5, structured output via `output_config.format`) rather than n8n's Anthropic node, because the node hides token usage and the system prompt, both of which the Langfuse trace needs. Tested against Ray's test MMS: 4.7 s, correct "not a plumbing photo" answer.
 - 2026-09-13 Langfuse tracing from n8n posts an OpenTelemetry span to `/api/public/otel/v1/traces` with `langfuse.*` attributes. The older `/api/public/ingestion` endpoint is deprecated and sunsets 2026-11-16. Trace name `analyze-photo`, user id is the caller phone number (PII, disclosed in the privacy policy; revisit if a hashed id is preferred).
