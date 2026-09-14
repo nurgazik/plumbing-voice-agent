@@ -82,8 +82,8 @@ Verbal SMS consent before the first text of a call, word for word from `complian
 
 ## Build order and status
 
-1. Answer in character with disclosures, two triage questions, name and address. No tools. Tested via Retell web call. (current)
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool. Needs A2P approval.
+1. Answer in character with disclosures, two triage questions, name and address. No tools. Tested via Retell web call. Done, 38/38 evals.
+2. Photo loop: MMS in, vision, `get_photo_analysis` tool. (current) Backend done and verified live 2026-09-13: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers. Not done: step 2 eval cases (design proposed, awaiting yes), prompt update from "no tools" to the photo flow, tool wired into the Retell agent. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 entries.
 3. Quote via `send_quote`.
 4. Booking via `get_availability` and `book_slot` (Cal.com).
 5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
