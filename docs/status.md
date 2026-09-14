@@ -4,14 +4,14 @@ The one file that changes every session. Read it at session start; update it bef
 
 ## Current step
 
-Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written 2026-09-14 and run: 3 of 8 photo cases fail, all prompt gaps (see Next actions). Remaining: prompt update, tool wired into the Retell agent, real call.
+Step 2, photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Remaining: fix the tool URL in push.ts, push to Retell, real call with a photo.
 
 ## Build order
 
 The eval set for a step is written before the step is built.
 
 1. Answer in character with disclosures, two triage questions, name and address. No tools. Done, 38/38 evals.
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Not done: prompt update from "no tools" to the photo flow, tool wired into the Retell agent. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
+2. Photo loop: MMS in, vision, `get_photo_analysis` tool. In progress. Done: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers, eval harness passes the tool to Haiku and replays tool results, 8 photo cases in `evals/cases/photo.yaml`, `build_step` is 2. Prompt updated to the photo flow, 54/54. Not done: tool wired into the Retell agent, real call. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 and 2026-09-14 entries.
 3. Quote via `send_quote`.
 4. Booking via `get_availability` and `book_slot` (Cal.com).
 5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
@@ -21,8 +21,7 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- Update `agent/prompt.md` from "no tools" to the photo flow. Last run (2026-09-14, 54 results, 49 pass): the three failing photo cases show what the prompt must fix. (a) After the address the agent asks for the callback number instead of the photo. (b) On the routine tier it sometimes says the urgent callback line, "first thing in the morning". (c) When the caller declines the photo it invents a phone number to confirm ("604-555-0199"); it must say "this number", never digits it was not given.
-- Wire `get_photo_analysis` into the Retell agent and push. Before pushing, fix the tool URL in `agent/push.ts`: it builds `<base>/get_photo_analysis` but the n8n webhook path is `tools/get-photo-analysis`.
+- Fix the tool URL in `agent/push.ts`: it builds `<base>/get_photo_analysis` but the n8n webhook path is `tools/get-photo-analysis`. Then `npm run push` (runs the suite first) so `get_photo_analysis` is live on the Retell agent.
 - Real phone call with a photo, then confirm the Langfuse trace and the `photos.retell_call_id` stamp.
 
 ## Blockers

@@ -1,4 +1,4 @@
-# Beat 9. Step 1 closes after intake with a callback promise, no booking yet.
+# Beat 9. Step 2 closes after intake (photo declined here) with a callback promise, no quote or booking yet.
 - description: Close includes the STOP line verbatim
   metadata:
     beats: [IC-9, EC-8]
@@ -15,7 +15,11 @@
       - role: user
         content: "2288 West Broadway, unit 305, Vancouver."
       - role: assistant
-        content: "Got it. Is this the best number to reach you on?"
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "I'm not at home right now, so I can't. Let's skip that."
+      - role: assistant
+        content: "No problem. Is this the best number to reach you on?"
       - role: user
         content: "Yep, this one's fine. That's everything?"
   assert:
