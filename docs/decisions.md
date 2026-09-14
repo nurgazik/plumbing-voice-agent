@@ -1,6 +1,8 @@
 # Decisions
 
-One line per decision, dated, newest first. Non-obvious calls only.
+One entry per decision, dated, newest first, append only. Non-obvious calls only.
+
+Entry shape from 2026-09-14 on: the situation, what we chose over what, what we accept by choosing it, and when to reconsider. Rejected routes and research that led nowhere go here too, with the constraint that killed them, so a contextual no is not read later as a universal no. Earlier entries keep their original one-line form.
 
 - 2026-09-13 First live MMS through the full path (Twilio to n8n to Sonnet to Supabase to Langfuse) with no replay: Ray's sink photo, saved as `evals/fixtures/sink-under-cabinet.jpg`. Sonnet saw no leak and answered job_type unknown at 0.3 confidence, which is the honest read; the caller's description has to carry the rest. Langfuse user id stays the caller phone number for now (Ray's call). Key rotation deferred by Ray.
 - 2026-09-13 Step 2 photo loop verified end to end on Ray's test MMS replayed into n8n: Twilio acknowledged in 0.4 s, photos row done in ~15 s, Langfuse generation `analyze-photo` shows model, 2892 tokens, cost $0.0067, input and structured output. Twilio's messaging service and number now post inbound messages to `/webhook/twilio-inbound-mms`. Known nit: `langfuse.trace.tags` lands in raw attributes instead of tags; fix with the next workflow change.

@@ -22,6 +22,18 @@ The loop: rules load into the prompt, the agent calls a tool, n8n does the work 
 
 Twilio (Canadian number, SMS, MMS), Retell (built-in Claude Haiku, billed by Retell; BYOK is unsupported for the built-in LLM), Anthropic API (Haiku for turns, Sonnet for reasoning and vision), n8n Cloud, Supabase, Cal.com, HubSpot free CRM, Vercel + Next.js (landing page, later the quote page), Langfuse (traces), Promptfoo (evals), Retell simulation testing.
 
+## Docs
+
+Fetch current documentation before using a tool's API; don't work from memory.
+
+- Retell: https://docs.retellai.com/llms.txt
+- n8n: https://docs.n8n.io/llms.txt (workflows are pushed through the n8n MCP server)
+- Cal.com: https://cal.com/docs/llms.txt
+- Langfuse: https://langfuse.com/llms.txt, plus the vendored skill at `.claude/skills/langfuse/`
+- Supabase: no llms.txt; use the official Supabase MCP server or https://supabase.com/docs
+- Twilio: https://www.twilio.com/docs
+- Anthropic API: the claude-api skill
+
 ## The spec
 
 `docs/ideal-call.md` is the spec. It is the one call we want, written as a two-column transcript (what is said, what the system does), plus the ten beats an eval grades. Evals grade behaviour, not wording. `docs/emergency-call.md` is the second test case and defines the escalation path. Read both before touching the prompt, tools, or schema.
@@ -36,7 +48,8 @@ docs/
   architecture.md
   ideal-call.md
   emergency-call.md
-  decisions.md            one line per decision, dated, newest first
+  decisions.md            one entry per decision, dated, newest first, append only
+  status.md               current step, next actions, blockers, open decisions; changes every session
 rules/
   plumbing.yaml           the rules file: hours, on-call, urgency tiers, job types, price bands, escalation, follow-up cadence
   schema.json             what a valid rules file must contain
@@ -61,6 +74,7 @@ web/                      Next.js landing page (later)
 - Every LLM call, in Retell or in n8n, emits a Langfuse trace.
 - Prompt changes run the eval suite before being pushed.
 - Record every non-obvious decision in `docs/decisions.md` in one line.
+- At session start read `docs/status.md` and the last five entries of `docs/decisions.md`. Update `docs/status.md` before the session ends. Build progress, blockers, and open decisions live there, not here.
 
 ## Agent behaviour rules (from the ideal call review)
 
@@ -79,21 +93,3 @@ web/                      Next.js landing page (later)
 Spoken recording disclosure. AI disclosure on request and in the opener. CASL opt-out on every text (STOP). Document US data routing (Retell, Anthropic, n8n, Supabase regions) in `docs/architecture.md`.
 
 Verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask` in the rules file. It is registered with the carriers and published at nurgazy.com/dryrunplumbing/sms; those three must stay identical. The public privacy policy, terms, and opt-in pages are listed in `docs/compliance-pages.md`. `compliance.sms_footer` is still placeholder text and needs the real entity and mailing address before step 3 sends anything.
-
-## Build order and status
-
-1. Answer in character with disclosures, two triage questions, name and address. No tools. Tested via Retell web call. Done, 38/38 evals.
-2. Photo loop: MMS in, vision, `get_photo_analysis` tool. (current) Backend done and verified live 2026-09-13: Twilio posts to n8n, Sonnet vision, Supabase `photos` row, Langfuse trace, tool webhook answers. Not done: step 2 eval cases (design proposed, awaiting yes), prompt update from "no tools" to the photo flow, tool wired into the Retell agent. See `workflows/README.md` and `docs/decisions.md` 2026-09-13 entries.
-3. Quote via `send_quote`.
-4. Booking via `get_availability` and `book_slot` (Cal.com).
-5. After-call: summary, Supabase record, HubSpot, wrap-up SMS, scheduled follow-up.
-6. Evals in Promptfoo and Retell simulation; Langfuse traces on every call.
-7. Escalation (`escalate` tool, SMS channel only; other channels exist as config values).
-8. Spam gate, knowledge-base Q&A, weekly report, landing page.
-
-The eval set for a step is written before the step is built.
-
-## Open decisions
-
-- Is Dry Run Plumbing a one-person shop with one on-call number, or a small crew? Affects the availability model and the on-call section of the rules file.
-- Twilio: the Canadian number is provisioned and voice works. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked and steps 2 through 5 are no longer gated. Twilio credentials live in `.env`.
