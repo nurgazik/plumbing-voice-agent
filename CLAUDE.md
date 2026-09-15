@@ -13,7 +13,7 @@ Ray is a product manager learning to code. He builds with Claude Code and acts a
 ## Architecture: three layers, one loop
 
 - Conversation layer: Retell runs the live call (speech to text, turn-taking, text to speech, tool calling). Claude Haiku handles turns. The rules file is loaded into the prompt at call start.
-- Actions layer: n8n workflows. Every tool call from Retell and every Retell or Twilio webhook lands here. n8n calls Claude Sonnet for photo analysis, quotes, and summaries, and talks to Cal.com, HubSpot, Twilio SMS, and Supabase.
+- Actions layer: n8n workflows. Every tool call from Retell and every Retell or Twilio webhook lands here. n8n calls Claude Sonnet for photo analysis and summaries (quotes are deterministic, from the rules file), and talks to Cal.com, HubSpot, Twilio SMS, and Supabase.
 - Memory layer: Supabase (Postgres) for callers, calls, photos, quotes, bookings, follow-ups. The rules file (`rules/plumbing.yaml`) is versioned here in the repo. Langfuse holds traces.
 
 The loop: rules load into the prompt, the agent calls a tool, n8n does the work and reads or writes Supabase, the result returns as the tool's response, the agent says it out loud.

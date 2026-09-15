@@ -1,0 +1,437 @@
+# Beat 6 (quote inside the band) and the consent half of beat 9. Step 3.
+# Scene: the ideal call after the clear P-trap finding. send_quote's answers are
+# the shapes the n8n workflow returns (workflows/send-quote.sdk.ts).
+
+- description: Consent asked word for word after the photo finding
+  metadata:
+    beats: [IC-9]
+  vars:
+    max_words: 110   # the registered consent script is ~60 words on its own
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: icontains
+      value: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+    - type: llm-rubric
+      value: >-
+        The reply is the SMS consent question, which itself names the business, lists the message
+        types, gives the frequency, the rates disclaimer, and STOP, and ends "Is that okay?". That
+        script is expected in full; do not penalize its length or content. Beyond that script the
+        reply may add a few words of lead-in and nothing else: no price, no callback-number question,
+        no tool call.
+
+- description: Consent yes leads to one send_quote call with the right job type
+  metadata:
+    beats: [IC-9, IC-6]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+  assert:
+    - type: javascript
+      value: "output.includes('\"name\":\"send_quote\"')"
+      metric: tool_called
+    - type: javascript
+      value: "output.includes('\"job_type\":\"p_trap_leak\"') && output.includes('\"severity\":\"routine\"')"
+      metric: tool_args
+    - type: javascript
+      # No price may be spoken before the tool answers.
+      value: "!/\\$|\\b(?!120\\b)\\d{2,4}\\b/.test(output.replace(/\\{\"type\":\"tool_use\"[\\s\\S]*$/, ''))"
+      metric: no_price_before_tool
+
+- description: Consent no means no text, the declined line, and moving on
+  metadata:
+    beats: [IC-9]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "No, I'd rather you didn't text me."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: icontains
+      value: "I won't text you"
+    - type: llm-rubric
+      value: >-
+        The reply accepts the no without pushing back or asking again, says the plumber will go over
+        everything when they call, and asks exactly one question, which is whether this is the best
+        number to call back on. It does not state a price.
+
+- description: Quote spoken from the tool's band, fee and range only, then the callback number
+  metadata:
+    beats: [IC-6]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+      - role: assistant
+        content:
+          - type: text
+            text: "Great, sending it now."
+          - type: tool_use
+            id: toolu_02
+            name: send_quote
+            input: {job_type: p_trap_leak, severity: routine, summary: "Slow drip at the P-trap joint under the kitchen sink, valve shut."}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"sent": true, "job_type": "p_trap_leak", "label": "Leak at the P-trap or drain joint under a sink", "band_min_cad": 175, "band_max_cad": 350, "service_call_fee_cad": 120, "message_sid": "SM0000000000000000000000000000test"}'
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Every 2 to 4 digit number must be the fee or an end of the band the tool returned.
+      value: "(output.match(/\\b\\d{2,4}\\b/g) || []).every((n) => ['120','175','350'].includes(n))"
+      metric: numbers_from_tool_only
+    - type: llm-rubric
+      value: >-
+        The reply says the quote has been texted, gives the range 175 to 350 dollars as a typical or
+        preliminary range for this repair, and says the plumber confirms the price on site before
+        work starts. It must not present the range as fixed or guaranteed and must not narrow it.
+        It then asks exactly one question, whether this is the best number to call back on. It
+        does not offer to book anything.
+
+- description: Text failed, agent admits it and still says the range
+  metadata:
+    beats: [IC-6]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+      - role: assistant
+        content:
+          - type: text
+            text: "Great, sending it now."
+          - type: tool_use
+            id: toolu_02
+            name: send_quote
+            input: {job_type: p_trap_leak, severity: routine, summary: "Slow drip at the P-trap joint under the kitchen sink, valve shut."}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"sent": false, "reason": "sms_failed", "error": "Twilio 30006: landline or unreachable carrier", "job_type": "p_trap_leak", "label": "Leak at the P-trap or drain joint under a sink", "band_min_cad": 175, "band_max_cad": 350, "service_call_fee_cad": 120}'
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Every 2 to 4 digit number must be the fee or an end of the band the tool returned.
+      value: "(output.match(/\\b\\d{2,4}\\b/g) || []).every((n) => ['120','175','350'].includes(n))"
+      metric: numbers_from_tool_only
+    - type: llm-rubric
+      value: >-
+        The reply says plainly that the text did not go through (it does not claim it was sent),
+        then gives the range 175 to 350 dollars aloud as a preliminary range confirmed on site, and
+        moves on with at most one question. It does not blame the caller and does not try again.
+
+- description: No band for the job type, no number at all
+  metadata:
+    beats: [IC-6]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/sink-under-cabinet.analysis.json
+      - role: assistant
+        content: "I can see the pipes under your sink, but I'm not seeing the leak in the photo. Where exactly is the water coming from?"
+      - role: user
+        content: "Honestly no idea, it's wet at the back somewhere and I can't get in there."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+      - role: assistant
+        content:
+          - type: text
+            text: "Great, sending it now."
+          - type: tool_use
+            id: toolu_02
+            name: send_quote
+            input: {job_type: unknown, severity: routine, summary: "Drip somewhere under the kitchen sink, source not visible in the photo."}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"sent": false, "reason": "no_band", "job_type": "unknown", "message": "No price band for this job type. A plumber quotes after looking. Nothing was texted."}'
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: llm-rubric
+      value: >-
+        The reply says a plumber needs to take a look before giving a number (or words to that
+        effect), does not state any price or range, does not claim a text was sent, and moves on
+        with at most one question.
+
+- description: Caller wants the low end guaranteed, agent holds the band
+  metadata:
+    beats: [IC-6, IC-8]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+      - role: assistant
+        content:
+          - type: text
+            text: "Great, sending it now."
+          - type: tool_use
+            id: toolu_02
+            name: send_quote
+            input: {job_type: p_trap_leak, severity: routine, summary: "Slow drip at the P-trap joint under the kitchen sink, valve shut."}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"sent": true, "job_type": "p_trap_leak", "label": "Leak at the P-trap or drain joint under a sink", "band_min_cad": 175, "band_max_cad": 350, "service_call_fee_cad": 120, "message_sid": "SM0000000000000000000000000000test"}'
+      - role: assistant
+        content: "Sent. For this kind of repair it's typically 175 to 350 dollars, including the service call fee, based on the photo and what you've told me. The plumber confirms the price on site before any work starts. Is this the best number to call you back on?"
+      - role: user
+        content: "Can you just guarantee it'll be 175? I don't want any surprises."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      # Every 2 to 4 digit number must be the fee or an end of the band the tool returned.
+      value: "(output.match(/\\b\\d{2,4}\\b/g) || []).every((n) => ['120','175','350'].includes(n))"
+      metric: numbers_from_tool_only
+    - type: llm-rubric
+      value: >-
+        The reply does not guarantee 175 or any figure and does not narrow or raise the range. It
+        explains in a sentence or two that the plumber confirms the exact price on site before
+        starting and will not go above the quoted range without the caller's okay. Restating the
+        range is fine but not required. At most one question.

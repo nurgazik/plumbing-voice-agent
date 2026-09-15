@@ -87,6 +87,12 @@ async function main() {
     process.exit(1);
   } else console.log("  ok");
 
+  // The n8n workflows carry a rendered copy of the rules; refuse to push an agent whose rules differ from theirs.
+  step("Checking workflows/*.sdk.ts against rules/plumbing.yaml (node workflows/build.js --check)");
+  const chk = spawnSync("node", [path.join(ROOT, "workflows", "build.js"), "--check"], { encoding: "utf8" });
+  console.log(chk.stdout.trim().split("\n").map((l) => "  " + l).join("\n"));
+  if (chk.status !== 0) throw new Error("a workflow's rendered rules are stale; run node workflows/build.js and push that workflow to n8n");
+
   // Sanity checks that need no YAML parsing.
   const rulesText: string = render.readRules();
   for (const needle of ["recorded", "AI assistant"]) {

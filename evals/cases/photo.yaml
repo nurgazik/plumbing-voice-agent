@@ -155,7 +155,7 @@
   metadata:
     beats: [IC-5, IC-6]
   vars:
-    max_words: 85
+    max_words: 110   # from step 3 the finding may carry the 60-word consent question
     conversation:
       - role: user
         content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
@@ -196,7 +196,7 @@
         The reply tells the caller what the photo shows: the joint at the P-trap, the curved pipe
         under the drain, is the likely source. It reassures in a few words (common, not dangerous)
         and tells them to keep the valve off. It does not state any repair price or range, in digits
-        or in words. At most one question.
+        or in words. At most one question; that question may be the SMS consent question.
     - type: not-icontains
       # Routine tier. "First thing in the morning" is the urgent callback line.
       value: "first thing in the morning"

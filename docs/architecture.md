@@ -6,7 +6,7 @@ Three layers, one loop. See CLAUDE.md for the short version.
 
 Conversation: Retell runs the live call (speech to text, turn-taking, text to speech, tool calling). Claude 4.5 Haiku handles turns through Retell's built-in LLM, billed by Retell. Retell does not support bring-your-own-key for its built-in LLM; using our own Anthropic key would mean running a custom LLM websocket server, which is not worth it for this demo. The Anthropic key is used directly by n8n and by the evals. The rules file is rendered into the prompt at push time, not fetched at call time.
 
-Actions: n8n Cloud. Every Retell tool call and every Retell or Twilio webhook lands on an n8n webhook. n8n calls Claude Sonnet for photo analysis, quotes, and summaries, and talks to Cal.com, HubSpot, Twilio SMS, and Supabase.
+Actions: n8n Cloud. Every Retell tool call and every Retell or Twilio webhook lands on an n8n webhook. n8n calls Claude Sonnet for photo analysis and summaries, builds quotes from the rules file with no model, and talks to Cal.com, HubSpot, Twilio SMS, and Supabase.
 
 Memory: Supabase Postgres. Tables: callers, calls, photos, quotes, bookings, escalations, follow-ups. Langfuse holds traces.
 
@@ -27,7 +27,7 @@ Memory: Supabase Postgres. Tables: callers, calls, photos, quotes, bookings, esc
 ## Tools (Retell custom functions, each an n8n webhook)
 
 - `get_photo_analysis`: returns the latest photo result for this caller, or nothing.
-- `send_quote`: picks the price band from the rules file for the job type, sends the SMS, stores the quote.
+- `send_quote`: picks the price band from the rules file for the job type (rendered into the workflow by `workflows/build.js`), sends the SMS from a fixed template, stores the quote. One per call.
 - `get_availability`: asks Cal.com for open slots by urgency.
 - `book_slot`: creates the Cal.com booking, sends the confirmation SMS.
 - `escalate`: texts the on-call number, stores the escalation, returns confirmation.

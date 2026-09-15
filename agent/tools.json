@@ -15,18 +15,15 @@
     {
       "name": "send_quote",
       "built": 3,
-      "description": "Send the caller a preliminary quote by text for the identified job type. The price band comes from the rules file on the server side; do not pass a price. Call it once, after the photo has been discussed, and only for urgent or routine tiers.",
+      "description": "Text the caller a preliminary quote for the identified job type and store it. The price band comes from the rules file on the server side; do not pass a price. The caller's number comes with the call. Call it once per call, only after the caller has said yes to the SMS consent question, and only on the routine or urgent tier. Returns the band it sent (band_min_cad, band_max_cad, service_call_fee_cad) so you can say it aloud; or sent false with a reason: no_band means a plumber must look before any number, sms_failed means the text did not go through but you may still say the band aloud.",
       "speak_during_execution": true,
       "speak_after_execution": true,
       "parameters": {
         "type": "object",
         "properties": {
-          "caller_phone": {
-            "type": "string"
-          },
           "job_type": {
             "type": "string",
-            "description": "A job_types key from the rules file, for example p_trap_leak."
+            "description": "A job_types key from the rules file, for example p_trap_leak. Use unknown if the photo and the caller's words do not point to one."
           },
           "severity": {
             "type": "string",
@@ -41,7 +38,6 @@
           }
         },
         "required": [
-          "caller_phone",
           "job_type",
           "severity",
           "summary"
