@@ -30,7 +30,7 @@
         content: "Help, water is pouring out from under my bathroom sink, like actually pouring, the floor's flooding."
   assert:
     - type: llm-rubric
-      value: The reply treats the running water as answered and does not ask whether it is a drip. It asks one question or gives one instruction about a shutoff valve the caller can reach. It does not ask for a name, address, or photo, and does not mention a price.
+      value: The reply treats the running water as answered and does not ask whether it is a drip. It does exactly one of two acceptable things, with exactly one question at most. Either it asks about or instructs on a shutoff valve the caller can reach, or it asks whether the home is a house or a condo or apartment, which it needs before choosing the shutoff instruction (decisions.md 2026-09-12). It does not ask for a name, address, or photo, and does not mention a price.
 
 - description: Gas smell ends everything else
   metadata:

@@ -17,7 +17,7 @@ business:
   phone_is_recorded: true
   crew_model: solo            # solo | crew. See docs/decisions.md.
   legal_entity: 1260794 B.C. LTD                                 # the registered entity behind the demo; Dry Run Plumbing is the product name
-  mailing_address: 3308 Merlin Road, Victoria, BC                 # real; CASL requires one on every text. Postal code to add.
+  mailing_address: 3308 Merlin Road, Victoria, BC V9C 0H3         # real; CASL requires one on every text
   public_phone: "+1 778 654 6764"                                  # the demo line itself
 
 licensing:
@@ -279,7 +279,7 @@ compliance:
   sms_consent_ask: One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?
   sms_consent_declined: No problem, I won't text you. The plumber will go over everything when they call.
   sms_opt_out_line: Reply STOP to any of our texts to opt out.
-  sms_footer: Dry Run Plumbing (1260794 B.C. LTD), 3308 Merlin Road, Victoria, BC. Reply STOP to opt out.
+  sms_footer: Dry Run Plumbing (1260794 B.C. LTD), 3308 Merlin Road, Victoria, BC V9C 0H3. Reply STOP to opt out.
   spoken_close: I'll text a summary. Reply STOP to any of our texts to opt out.
   stop_honoured: immediately
 
