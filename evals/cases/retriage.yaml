@@ -1,0 +1,383 @@
+# Priority settled from the caller's answers plus the photo (rules: triage.after_photo).
+# Confirm, raise, hold, never lower, photo too weak, no photo, and the close after
+# a raise. Beats IC-3 (tier from triage) and IC-5 (photo used); decided 2026-09-15.
+
+- description: Words and photo agree, routine stays routine
+  metadata:
+    beats: [IC-3, IC-5]
+  vars:
+    max_words: 130
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: javascript
+      # No upgrade language.
+      value: "!/more urgent|treat(ing)? (this|it) as urgent|bump|escalat/i.test(output)"
+      metric: tier_not_raised
+    - type: not-icontains
+      # "next open slot" is the urgent tier's wording in the prompt.
+      value: "next open slot"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: llm-rubric
+      value: >-
+        The reply describes the P-trap finding in plain words and does not raise the urgency: it
+        does not call the situation urgent, more serious, or say a plumber must come sooner. It may
+        say the photo confirms what the caller described. Keep the valve off is fine. At most one
+        question, which may be the SMS consent question. No price.
+
+- description: Photo adds a fact, routine becomes urgent, both facts named
+  metadata:
+    beats: [IC-3, IC-5]
+  vars:
+    max_words: 130
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I tried the valve but it won't turn, it's still dripping into a bucket."
+      - role: assistant
+        content: "Okay. A slow drip into a bucket is contained, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/supply-line-leak.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: javascript
+      value: "/urgent/i.test(output)"
+      metric: says_urgent
+    - type: not-icontains
+      value: "next business day"
+    - type: llm-rubric
+      value: >-
+        The reply raises the priority to urgent and explains why in a sentence that names BOTH
+        facts: the caller cannot close the valve, and the photo shows the leak is on the supply or
+        pressurized side (shutoff valves, supply lines, copper pipes). It does not tell the caller
+        someone is coming tonight and does not state a price. It may add a short safety note such
+        as keeping a bucket or towel there. At most one question, which may be the SMS consent
+        question.
+
+- description: Same photo but the valve is closed, contained wins, routine holds
+  metadata:
+    beats: [IC-3, IC-5]
+  vars:
+    max_words: 130
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/supply-line-leak.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: javascript
+      # No upgrade language.
+      value: "!/more urgent|treat(ing)? (this|it) as urgent|bump|escalat/i.test(output)"
+      metric: tier_not_raised
+    - type: not-icontains
+      # "next open slot" is the urgent tier's wording in the prompt.
+      value: "next open slot"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: llm-rubric
+      value: >-
+        The reply describes the supply-line finding (water at the shutoff valves or supply lines)
+        and tells the caller to keep the valve off, but does NOT raise the urgency: the caller has
+        already shut the water off, so the problem is contained. It does not say urgent, does not
+        say someone must come sooner, and does not state a price. At most one question, which may
+        be the SMS consent question.
+
+- description: Urgent from the caller's words, a milder photo never lowers it
+  metadata:
+    beats: [IC-3, IC-5]
+  vars:
+    max_words: 130
+    conversation:
+      - role: user
+        content: "Water was spraying out under my kitchen sink. I got the valve closed and it's stopped now."
+      - role: assistant
+        content: "Good, with the valve closed that's contained, so this can wait until the next open slot. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: not-icontains
+      value: "next business day"
+    - type: llm-rubric
+      value: >-
+        The reply describes the P-trap finding and does NOT lower the priority: it does not say the
+        problem is now routine, minor, or can wait longer than first said, and does not switch to a
+        next-business-day plan. It may keep the same tier without naming it. Keep the valve off is
+        fine. No price. At most one question, which may be the SMS consent question.
+
+- description: Photo too weak to use, tier from the words stands
+  metadata:
+    beats: [IC-3, IC-5]
+  vars:
+    max_words: 85
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I tried the valve but it won't turn, it's still dripping into a bucket."
+      - role: assistant
+        content: "Okay. A slow drip into a bucket is contained, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/sink-under-cabinet.analysis.json
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-contains
+      value: "$"
+    - type: javascript
+      # No upgrade language.
+      value: "!/more urgent|treat(ing)? (this|it) as urgent|bump|escalat/i.test(output)"
+      metric: tier_not_raised
+    - type: not-icontains
+      # "next open slot" is the urgent tier's wording in the prompt.
+      value: "next open slot"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: llm-rubric
+      value: >-
+        The reply says it can see the pipes but not the leak in the photo, and does not raise or
+        lower the priority. It must not assert that the leak is on the supply side or a pressurized
+        line, since the photo did not show that; asking the caller where the water is coming from,
+        including offering the supply lines and the trap as options inside one question, is good.
+        Exactly one question mark. No price.
+
+- description: No photo, close uses the tier from the words alone
+  metadata:
+    beats: [IC-3, IC-9]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I tried the valve but it won't turn, it's still dripping into a bucket."
+      - role: assistant
+        content: "Okay. A slow drip into a bucket is contained, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Sorry, I actually stepped away from the house, I can't get a photo right now."
+      - role: assistant
+        content: "No problem. Is this the best number to call you back on?"
+      - role: user
+        content: "Yeah. That's everything, I think."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: icontains
+      value: "next business day"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: llm-rubric
+      value: >-
+        The reply closes the call with the routine callback line (a plumber calls during business
+        hours on the next business day), the STOP line, and a short sign-off. It does not ask the
+        SMS consent question, does not guess at what a photo would have shown, does not raise the
+        urgency, and does not state a price.
+    - type: not-contains
+      value: "$"
+
+- description: Close after a raise uses the urgent callback line
+  metadata:
+    beats: [IC-3, IC-9, EC-8]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I tried the valve but it won't turn, it's still dripping into a bucket."
+      - role: assistant
+        content: "Okay. A slow drip into a bucket is contained, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/supply-line-leak.analysis.json
+      - role: assistant
+        content: "I can see water dripping from the shut-off valves and copper supply lines under your sink. Since that valve won't close and the leak is on the pressurized side, I'm going to treat this as urgent. Keep a bucket under it tonight."
+      - role: user
+        content: "Okay, thanks. Look, I've got to run, that's everything for now."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: icontains
+      value: "first thing in the morning"
+    - type: not-icontains
+      value: "next business day"
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: llm-rubric
+      value: >-
+        The reply closes the call: the urgent callback line (a plumber calls first thing in the
+        morning to book the next open slot), the STOP line, a short sign-off. It respects that the
+        caller is done: no consent question, no quote, no further intake question. It does not
+        promise a visit tonight and does not state a price.
+    - type: not-contains
+      value: "$"

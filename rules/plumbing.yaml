@@ -114,6 +114,16 @@ triage:
     - sewage, or water coming up a floor drain
     - no water anywhere in the home
     - gas smell, even hedged
+  # Priority is settled once the picture is complete: the caller's answers plus
+  # the photo, if there is one. The photo can add a fact the caller could not
+  # know, such as which side of the sink the water is on.
+  after_photo:
+    photo_may_raise_tier: true
+    never_lower: true
+    min_confidence: 0.6          # below this the photo does not move the tier
+    how: Combine the photo's job type with the shutoff answer using the tier signals above. A supply-side leak the caller cannot shut off is urgent even if the words alone said routine. A leak the caller has shut off, or a drain-side leak, stays where it is. With no photo, or an unknown job type, the tier from the caller's words stands.
+    say_when_raised: One sentence naming both facts, the valve that will not close and what the photo shows, then carry on with the new tier.
+    say_when_confirmed: A few words at most, or nothing.
 
 safety_instructions:
   water_running:

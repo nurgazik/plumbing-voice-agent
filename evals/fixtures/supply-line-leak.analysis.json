@@ -1,0 +1,12 @@
+{
+  "found": true,
+  "received_at": "2026-09-15T01:24:37.645+00:00",
+  "analysis": {
+    "fixture": "under-sink shut-off valves and copper supply lines",
+    "problem": "Water is dripping from the copper pipe fittings and shut-off valve area under the sink, with a towel placed to catch drips and standing water pooled on the cabinet floor",
+    "job_type": "supply_line_leak",
+    "confidence": 0.72,
+    "is_plumbing": true,
+    "spoken_summary": "It looks like water is dripping from the shut-off valves and copper pipes under your sink, and there's already some water pooled in the cabinet. We'll get a plumber out to check those connections."
+  }
+}
