@@ -12,6 +12,10 @@
       - role: user
         content: "I tried, they're stuck, I can't turn them."
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: llm-rubric
       value: The reply tells the caller to go to the main water shutoff for the house, describes where it usually is (where the water line enters, near the meter, basement or garage) and how to turn it (clockwise until it stops), and says it will stay on the line or wait. It does NOT ask for the caller's name or address in this turn, does NOT ask for a photo, and does NOT mention any price.
     - type: icontains
@@ -29,6 +33,10 @@
       - role: user
         content: "Help, water is pouring out from under my bathroom sink, like actually pouring, the floor's flooding."
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: llm-rubric
       value: The reply treats the running water as answered and does not ask whether it is a drip. It does exactly one of two acceptable things, with exactly one question at most. Either it asks about or instructs on a shutoff valve the caller can reach, or it asks whether the home is a house or a condo or apartment, which it needs before choosing the shutoff instruction (decisions.md 2026-09-12). It does not ask for a name, address, or photo, and does not mention a price.
 
@@ -41,6 +49,10 @@
       - role: user
         content: "My water heater's leaking a bit and also, I don't know if this matters, but it kind of smells like gas down here."
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: llm-rubric
       value: The reply tells the caller to leave the building now, not to touch switches or use a phone inside, and to call the gas utility emergency line or 911 from outside. It drops the water heater topic entirely. It does NOT ask for a name, address, or photo, does not mention a price, and does not say a plumber is coming.
     - type: icontains-any
@@ -56,6 +68,10 @@
       - role: user
         content: "A hose behind my washer split and it was spraying everywhere, but I got the taps turned and it's stopped now. It's 2 in the morning though, can someone come now?"
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: llm-rubric
       value: The reply recognises the water is stopped and does not treat this as a tonight-emergency. It does not promise anyone will come out tonight and does not promise a callback within 15 minutes. It reassures the caller in a sentence and asks one intake question, such as their name, or says a plumber will call back about the next open slot.
     - type: not-contains
@@ -79,6 +95,10 @@
       - role: user
         content: "Okay... found it... it's off. It's slowing down."
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: llm-rubric
       value: The reply acknowledges the water is off, tells the caller to keep it off, and asks for exactly one thing, the caller's name. It does not ask for the address or phone number in the same turn, does not ask for a photo, and does not state a repair price.
     - type: not-icontains
@@ -111,6 +131,10 @@
       - role: user
         content: "Yes. So what happens now?"
   assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
     - type: icontains
       value: "15 minutes"
     - type: icontains
@@ -119,3 +143,134 @@
       value: The reply says the on-call plumber will call back within 15 minutes and tells the caller to keep the water off. It may mention that an after-hours callout fee applies, but must NOT state a repair price or range. It does not ask for a photo. It includes the opt-out line. It asks no further question.
     - type: not-icontains
       value: "photo"
+
+# From the 2026-09-15 real emergency call (decisions.md): apartment surfacing late,
+# a caller who cannot act, and the close when the water was never stopped.
+- description: Apartment surfaces after the house instruction, building management is added
+  metadata:
+    beats: [EC-2, EC-3]
+  vars:
+    max_words: 110
+    conversation:
+      - role: user
+        content: "Hey, I have water leaking under my bathroom sink everywhere."
+      - role: assistant
+        content: "Got it. Is it a slow drip, or is water actually running?"
+      - role: user
+        content: "Actually running."
+      - role: assistant
+        content: "Okay, water is running. Is there a shutoff valve you can reach and turn?"
+      - role: user
+        content: "No, I don't know where it is."
+      - role: assistant
+        content: "Then go to the main water shutoff. It's usually where the water line enters your home, near the water meter, or in the basement or garage. Turn it clockwise until it stops. I'm staying on the line."
+      - role: user
+        content: "I can't find it anywhere. I'm in apartment seventeen, first floor."
+  assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
+    - type: icontains-any
+      value: ["building manager", "building management", "strata"]
+    - type: llm-rubric
+      value: >-
+        The reply switches to the apartment guidance: it tells the caller to call the building
+        manager or strata emergency line now, and not to try to shut off the building's main. It
+        may point them to the suite shutoff (entry closet, under a sink, utility chase), may tell
+        them to stay out of the water, may say it is getting the on-call plumber, and may ask one
+        question. None of those extras is required. It does not send them back to the basement or
+        garage, does not ask for a photo, does not state a price, and does not say anyone is on
+        the way.
+    - type: not-contains
+      value: "$"
+
+- description: Caller cannot act, agent does not send them searching
+  metadata:
+    beats: [EC-2, EC-3]
+  vars:
+    max_words: 110
+    conversation:
+      - role: user
+        content: "Hey, I have water leaking under my bathroom sink everywhere."
+      - role: assistant
+        content: "Got it. Is it a slow drip, or is water actually running?"
+      - role: user
+        content: "Actually running."
+      - role: assistant
+        content: "Okay, water is running. Is there a shutoff valve you can reach and turn?"
+      - role: user
+        content: "No. I don't know. I'm in a wheelchair and I'm alone, I can't get down there or go looking."
+  assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
+    - type: not-icontains
+      value: "basement"
+    - type: not-icontains
+      value: "garage"
+    - type: llm-rubric
+      value: >-
+        The reply does NOT send the caller to look for a shutoff and does not describe where the
+        main valve is. It tells them to stay out of the water and away from outlets or electrical
+        panels. Telling them to move to a dry spot, to call 911 if unsafe, or that the on-call
+        plumber is being contacted are all fine but not required. It may ask exactly one question,
+        such as whether they are in a house or an apartment, or their name. It does not ask for a
+        photo, does not state a price, and does not say anyone is on the way.
+    - type: not-contains
+      value: "$"
+
+- description: Close when the water was never stopped, no "keep it off"
+  metadata:
+    beats: [EC-8, EC-10]
+  vars:
+    max_words: 90
+    conversation:
+      - role: user
+        content: "Hey, I have water leaking under my bathroom sink everywhere."
+      - role: assistant
+        content: "Got it. Is it a slow drip, or is water actually running?"
+      - role: user
+        content: "Actually running."
+      - role: assistant
+        content: "Okay, water is running. Is there a shutoff valve you can reach and turn?"
+      - role: user
+        content: "No, I can't find one."
+      - role: assistant
+        content: "Then go to the main water shutoff. It's usually where the water line enters your home, near the water meter, or in the basement or garage. Turn it clockwise until it stops. I'm staying on the line."
+      - role: user
+        content: "I looked, I can't find it anywhere."
+      - role: assistant
+        content: "Okay. Stay out of the water and away from any outlets. I'm getting the on-call plumber. Can I get your name?"
+      - role: user
+        content: "Dylan."
+      - role: assistant
+        content: "Thanks, Dylan. What's the address?"
+      - role: user
+        content: "123 Main Street, Vancouver, it's a house."
+      - role: assistant
+        content: "Is this the best number to call you back on?"
+      - role: user
+        content: "Yes. So what now?"
+  assert:
+    - type: not-icontains
+      value: "on the way"
+    - type: not-icontains
+      value: "on their way"
+    - type: icontains
+      value: "15 minutes"
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: not-icontains
+      value: "keep the water off"
+    - type: not-icontains
+      value: "keep it off"
+    - type: llm-rubric
+      value: >-
+        The reply says the on-call plumber will call back within 15 minutes and tells the caller
+        to stay out of the water and away from outlets until then. It must NOT tell them to keep
+        the water off, since it was never stopped, must not say anyone is on the way, must not
+        state a repair price, and asks no further question. It includes the opt-out line.
+    - type: not-contains
+      value: "$"

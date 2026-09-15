@@ -23,6 +23,9 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
+- UNVERIFIED, waiting on credits: emergency fixes from the 2026-09-15 real call (rules: `callback_if_not_stopped`, `safety_instructions.caller_cannot_act`, `escalation.never_say`; prompt: apartment surfacing late switches to strata guidance, cannot-act branch, never "on the way", bucket is not a shutoff, close promises a text only after a consent yes; evals: "on the way" checks on every emergency case, three new emergency cases, digit check now "no digits the caller did not say", closing rubric no longer expects a text promise without consent, supply_line_leak note and urgent definition clarified so a closed valve stays routine). Last full run before the outage: 82 pass, 6 fail, the six addressed by these edits but not re-run.
+- Voice: Ray dislikes cartesia-Emily. Candidates with previews are in the 2026-09-15 chat; change `voice_id` in `agent/settings.json` and push.
+
 - Live check of the re-triage rule: a call where the valve will not close and the photo shows the supply side should get the "treating this as urgent" sentence, severity urgent on the quotes row, and the morning callback line at the close. Any photo call also re-checks the vision workflow.
 - Step 4, booking: `get_availability` and `book_slot` against Cal.com. Eval cases first. Prerequisites: Cal.com event type and API key are in `.env`; arrival windows in the rules; decide what the consent script's "appointment confirmation" text looks like.
 - Backlog from the first call: the prompt caps address clarification at one question and photo follow-up at one; Ray's view is that complete data matters more than the count, so relax the caps to "one question per turn, stop when complete". Not changed yet.
@@ -31,7 +34,7 @@ The eval set for a step is written before the step is built.
 
 ## Blockers
 
-None. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
+- Anthropic API credit balance is empty (2026-09-15, "credit balance too low", status 400). Blocks the eval suite, therefore every push, and the live photo analysis in n8n (same key). Ray to top up at console.anthropic.com Plans & Billing. Then `npm run push` to verify and deploy the unverified changes below. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
 
 ## Owed before later steps
 

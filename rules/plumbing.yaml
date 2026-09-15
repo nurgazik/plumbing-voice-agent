@@ -69,8 +69,10 @@ urgency_tiers:
     quote: never
     dispatch: same_night
     callback: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
+    # When the caller could not stop the water, "keep it off" is wrong. Use this instead.
+    callback_if_not_stopped: The on-call plumber will call you back within 15 minutes. Until then, stay out of the water and away from any outlets.
   urgent:
-    definition: The problem is contained for now but will get worse within a day, or the household has no hot water, no working toilet, a frozen pipe, or a single fixture unusable.
+    definition: The problem is contained for now but will get worse within a day, or the household has no hot water, no working toilet, a frozen pipe, or a single fixture unusable in a way that stops the household functioning. A sink with its valve closed for the night, drip caught, is routine.
     triage_signals:
       - leak that has been slowed or stopped with a shutoff
       - drip from a supply hose or valve under a sink or toilet with no working shutoff, because that line is under pressure
@@ -133,6 +135,13 @@ safety_instructions:
   water_running_strata:
     - Look for the suite shutoff, usually in the entry closet, under a sink, or in a utility chase, and turn it clockwise until it stops.
     - Do not try to shut off the building's water. Call your building manager or strata emergency line now; they control the riser and main shutoffs.
+  # The caller says they cannot move around, reach, or search: wheelchair, injury,
+  # frail, or alone and panicking. Do not send them hunting for a valve.
+  caller_cannot_act:
+    - Do not send them looking for a shutoff. Tell them to stay out of the water and away from any outlets or electrical panels, and to move to a dry spot if they can.
+    - If they are in an apartment or condo, tell them to call the building manager or strata emergency line now; the building can shut the water off from outside the suite.
+    - If they feel unsafe, tell them to call 911.
+    - Then say you are getting the on-call plumber and collect intake as usual.
   sewage_backup:
     - Stop running water and do not flush any toilets.
     - Keep people and pets away from the affected area.
@@ -170,6 +179,7 @@ job_types:
     label: Leak at a supply line or shutoff valve under a sink or toilet
     typical_tier: urgent
     price_band_cad: {min: 150, max: 350}
+    notes: Urgent because the line is under pressure and a drip can become a spray. That applies when the caller cannot shut it off. Once the valve is closed and the drip is caught, it is contained and routine.
   faucet_drip:
     label: Dripping faucet
     typical_tier: routine
@@ -248,6 +258,8 @@ escalation:
   to: on_call
   message_includes: [caller_name, callback_number, address, property_type, problem_summary, urgency_tier, shutoff_status]
   tell_the_caller: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
+  tell_the_caller_if_not_stopped: The on-call plumber will call you back within 15 minutes. Until then, stay out of the water and away from any outlets.
+  never_say: Never say help, a plumber, or anyone is on the way, coming over, or coming now. The callback line is the only promise.
   if_escalation_fails: Tell the caller you are having trouble reaching the on-call line and ask them to call back in five minutes. Do not pretend it went through.
 
 intake_fields:

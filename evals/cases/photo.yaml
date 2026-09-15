@@ -27,8 +27,8 @@
       value: "!output.includes('\"type\":\"tool_use\"')"
       metric: no_tool_call
     - type: javascript
-      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
-      value: "!/\\d{3,}/.test(output)"
+      # Any run of 3+ digits must have been said by the caller (their address is fine; a made-up phone number is not).
+      value: "(output.match(/\\d{3,}/g) || []).every((n) => JSON.stringify(context.vars.conversation).includes(n))"
       metric: no_invented_number
     - type: llm-rubric
       value: >-
@@ -64,8 +64,8 @@
       value: "!output.includes('\"type\":\"tool_use\"')"
       metric: no_tool_call
     - type: javascript
-      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
-      value: "!/\\d{3,}/.test(output)"
+      # Any run of 3+ digits must have been said by the caller (their address is fine; a made-up phone number is not).
+      value: "(output.match(/\\d{3,}/g) || []).every((n) => JSON.stringify(context.vars.conversation).includes(n))"
       metric: no_invented_number
     - type: llm-rubric
       value: >-
@@ -241,8 +241,8 @@
       value: "!output.includes('\"type\":\"tool_use\"')"
       metric: no_tool_call
     - type: javascript
-      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
-      value: "!/\\d{3,}/.test(output)"
+      # Any run of 3+ digits must have been said by the caller (their address is fine; a made-up phone number is not).
+      value: "(output.match(/\\d{3,}/g) || []).every((n) => JSON.stringify(context.vars.conversation).includes(n))"
       metric: no_invented_number
     - type: llm-rubric
       value: >-
@@ -307,8 +307,8 @@
       value: "!output.includes('\"type\":\"tool_use\"')"
       metric: no_tool_call
     - type: javascript
-      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
-      value: "!/\\d{3,}/.test(output)"
+      # Any run of 3+ digits must have been said by the caller (their address is fine; a made-up phone number is not).
+      value: "(output.match(/\\d{3,}/g) || []).every((n) => JSON.stringify(context.vars.conversation).includes(n))"
       metric: no_invented_number
     - type: llm-rubric
       value: >-
@@ -347,8 +347,8 @@
       value: "!output.includes('\"type\":\"tool_use\"')"
       metric: no_tool_call
     - type: javascript
-      # Nothing in this turn calls for a number. Digits here are invented, like a made-up phone number.
-      value: "!/\\d{3,}/.test(output)"
+      # Any run of 3+ digits must have been said by the caller (their address is fine; a made-up phone number is not).
+      value: "(output.match(/\\d{3,}/g) || []).every((n) => JSON.stringify(context.vars.conversation).includes(n))"
       metric: no_invented_number
     - type: llm-rubric
       value: >-

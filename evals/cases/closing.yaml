@@ -28,7 +28,9 @@
     - type: llm-rubric
       value: >-
         The reply says what happens next, namely that a plumber will call during business hours
-        or the next business day, and that a summary text is coming. It includes the opt-out line.
+        or the next business day. It includes the opt-out line. It must NOT promise a summary text
+        or any text, because the SMS consent question was never asked on this call (no photo, so no
+        quote).
         It must NOT promise a callback within a number of minutes (the 15-minute promise is for
         emergencies only), must NOT promise a specific arrival time, must NOT state a price, and
         must NOT ask for a photo. A warm sign-off is nice but not required.

@@ -103,7 +103,8 @@
     - type: not-contains
       value: "$"
     - type: javascript
-      value: "/urgent/i.test(output)"
+      # The decision in any of its wordings: urgent, or the urgent tier's morning slot.
+      value: "/urgent|first thing in the morning|next open slot|sooner/i.test(output)"
       metric: says_urgent
     - type: not-icontains
       value: "next business day"
@@ -222,9 +223,11 @@
     - type: llm-rubric
       value: >-
         The reply describes the P-trap finding and does NOT lower the priority: it does not say the
-        problem is now routine, minor, or can wait longer than first said, and does not switch to a
-        next-business-day plan. It may keep the same tier without naming it. Keep the valve off is
-        fine. No price. At most one question, which may be the SMS consent question.
+        call is now routine, does not say it can wait longer than first said, and does not switch to
+        a next-business-day plan. Reassurance about the finding itself (common, not dangerous, an
+        easy fix) is fine and is not a downgrade; lowering means changing the plan. It may keep the
+        same tier without naming it. Keep the valve off is fine. No price. At most one question,
+        which may be the SMS consent question.
 
 - description: Photo too weak to use, tier from the words stands
   metadata:
