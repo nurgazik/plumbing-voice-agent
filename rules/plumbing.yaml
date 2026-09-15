@@ -72,6 +72,7 @@ urgency_tiers:
     definition: The problem is contained for now but will get worse within a day, or the household has no hot water, no working toilet, a frozen pipe, or a single fixture unusable.
     triage_signals:
       - leak that has been slowed or stopped with a shutoff
+      - drip from a supply hose or valve under a sink or toilet with no working shutoff, because that line is under pressure
       - only toilet in the home not working
       - no hot water
       - frozen pipe with no burst yet
@@ -85,6 +86,8 @@ urgency_tiers:
     definition: Contained problem, nothing getting worse, household still functional.
     triage_signals:
       - slow drip with shutoff closed
+      - slow drip caught in a bucket, nothing getting worse, even with no shutoff
+      - drip from a drain joint or trap under a sink, which only leaks when the sink is used; tell the caller not to use that sink
       - dripping faucet
       - slow drain with other drains working
       - running toilet with a second toilet available

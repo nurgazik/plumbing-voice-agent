@@ -22,7 +22,7 @@ The eval set for a step is written before the step is built.
 ## Next actions
 
 - Decide step 3 scope and start its eval cases (send_quote by SMS). Prerequisites: real entity and address in `compliance.sms_footer`, the consent ask before the first text, the consent eval case, a `quotes` table, a build script that renders price bands from the rules file into the n8n workflow.
-- Product call for Ray: a slow drip the caller cannot shut off, bucket underneath, was triaged routine by the rules as written. Keep, or make "cannot shut off" urgent?
+- Rules gained the bucket-drip (routine) and pressurized-supply-drip (urgent) signals; not yet pushed to Retell. Goes out with the next push.
 - Backlog from the first call: the prompt caps address clarification at one question and photo follow-up at one; Ray's view is that complete data matters more than the count, so relax the caps to "one question per turn, stop when complete". Not changed yet.
 - Observability join, owed at step 5: one `calls` row per call (Retell call id, transcript, recording link, cost, tokens, latency) with photos, quotes, bookings pointing at it; Langfuse traces grouped per call by the Retell call id. Retell's built-in Haiku turns cannot reach Langfuse (no BYOK); they live in Retell's dashboard and public log only.
 - Real phone call with a photo, then confirm the Langfuse trace and the `photos.retell_call_id` stamp.
