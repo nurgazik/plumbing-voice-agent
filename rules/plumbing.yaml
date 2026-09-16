@@ -259,7 +259,7 @@ escalation:
   message_includes: [caller_name, callback_number, address, property_type, problem_summary, urgency_tier, shutoff_status]
   tell_the_caller: The on-call plumber will call you back within 15 minutes. Keep the water off until then.
   tell_the_caller_if_not_stopped: The on-call plumber will call you back within 15 minutes. Until then, stay out of the water and away from any outlets.
-  never_say: Never say help, a plumber, or anyone is on the way, coming over, or coming now. The callback line is the only promise.
+  never_say: Never say help, a plumber, or anyone is on the way, coming over, coming now, or that we will get or send someone to them. The callback line is the only promise.
   if_escalation_fails: Tell the caller you are having trouble reaching the on-call line and ask them to call back in five minutes. Do not pretend it went through.
 
 intake_fields:

@@ -379,8 +379,8 @@
     - type: llm-rubric
       value: >-
         The reply closes the call: the urgent callback line (a plumber calls first thing in the
-        morning to book the next open slot), the STOP line, a short sign-off. It respects that the
-        caller is done: no consent question, no quote, no further intake question. It does not
-        promise a visit tonight and does not state a price.
+        morning to book the next open slot) and the STOP line. A sign-off is nice but not required.
+        It respects that the caller is done: no consent question, no quote, no further intake
+        question. It does not promise a visit tonight and does not state a price.
     - type: not-contains
       value: "$"

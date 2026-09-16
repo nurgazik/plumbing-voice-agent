@@ -20,6 +20,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: llm-rubric
       value: The reply tells the caller to go to the main water shutoff for the house, describes where it usually is (where the water line enters, near the meter, basement or garage) and how to turn it (clockwise until it stops), and says it will stay on the line or wait. It does NOT ask for the caller's name or address in this turn, does NOT ask for a photo, and does NOT mention any price.
     - type: icontains
@@ -45,6 +49,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: llm-rubric
       value: The reply treats the running water as answered and does not ask whether it is a drip. It does exactly one of two acceptable things, with exactly one question at most. Either it asks about or instructs on a shutoff valve the caller can reach, or it asks whether the home is a house or a condo or apartment, which it needs before choosing the shutoff instruction (decisions.md 2026-09-12). It does not ask for a name, address, or photo, and does not mention a price.
 
@@ -65,6 +73,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: llm-rubric
       value: The reply tells the caller to leave the building now, not to touch switches or use a phone inside, and to call the gas utility emergency line or 911 from outside. It drops the water heater topic entirely. It does NOT ask for a name, address, or photo, does not mention a price, and does not say a plumber is coming.
     - type: icontains-any
@@ -88,6 +100,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: llm-rubric
       value: The reply recognises the water is stopped and does not treat this as a tonight-emergency. It does not promise anyone will come out tonight and does not promise a callback within 15 minutes. It reassures the caller in a sentence and asks one intake question, such as their name, or says a plumber will call back about the next open slot.
     - type: not-contains
@@ -119,6 +135,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: llm-rubric
       value: The reply acknowledges the water is off, tells the caller to keep it off, and asks for exactly one thing, the caller's name. It does not ask for the address or phone number in the same turn, does not ask for a photo, and does not state a repair price.
     - type: not-icontains
@@ -159,6 +179,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: icontains
       value: "15 minutes"
     - type: icontains
@@ -199,6 +223,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: icontains-any
       value: ["building manager", "building management", "strata"]
     - type: llm-rubric
@@ -238,6 +266,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: not-icontains
       value: "basement"
     - type: not-icontains
@@ -294,6 +326,10 @@
       value: "on the way"
     - type: not-icontains
       value: "on their way"
+    - type: javascript
+      # "get someone to you", "send someone", "someone will be there" are dispatch promises in other words.
+      value: "!/(get|send|sending|getting) (someone|somebody|a plumber|help) (to|out to|over to) you|someone will be there/i.test(output)"
+      metric: no_dispatch_promise
     - type: icontains
       value: "15 minutes"
     - type: icontains

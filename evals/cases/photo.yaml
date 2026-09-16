@@ -149,8 +149,9 @@
         sink but cannot see the leak or any damage in the photo itself. It does not name a specific
         fault or job type as if confirmed, and does not say the photo did not arrive. It may connect
         the photo to the caller's description of a drip. It does not state any repair price or
-        range, in digits or in words. It ends with at most one question or moves to the next intake
-        step.
+        range, in digits or in words. It ends with at most one question mark; that one question may
+        combine "where is it coming from" with the drain-side-or-supply-side options, which is
+        good.
     - type: not-contains
       value: "$"
 
@@ -207,8 +208,10 @@
     - type: llm-rubric
       value: >-
         The reply does not give up on the job type. It asks exactly one plain-words question that
-        offers the two sides: is the water coming from the curved drain pipe or a drain joint, or
-        from the hoses or small valves that feed the tap. It does not name a fault as confirmed,
+        offers the two sides, drain side (the curved drain pipe, its joints) versus supply side
+        (the hoses or small valves that feed the tap); the exact wording of each side does not
+        matter as long as a caller could tell which one they mean. It does not name a fault as
+        confirmed,
         does not state a price, does not ask the SMS consent question yet, and does not say when a
         plumber will call.
     - type: not-contains
