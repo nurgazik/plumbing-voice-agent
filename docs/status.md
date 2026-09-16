@@ -24,7 +24,6 @@ The eval set for a step is written before the step is built.
 ## Next actions
 
 - Live check of the emergency fixes from the 2026-09-15 call: an apartment caller who cannot find a shutoff should hear the building-management line, never "on the way", and a close that says stay out of the water rather than keep it off.
-- Voice: Ray dislikes cartesia-Emily. Candidates with previews are in the 2026-09-15 chat; change `voice_id` in `agent/settings.json` and push.
 
 - Live check of the re-triage rule: a call where the valve will not close and the photo shows the supply side should get the "treating this as urgent" sentence, severity urgent on the quotes row, and the morning callback line at the close. Any photo call also re-checks the vision workflow.
 - Step 4, booking: `get_availability` and `book_slot` against Cal.com. Eval cases first. Prerequisites: Cal.com event type and API key are in `.env`; arrival windows in the rules; decide what the consent script's "appointment confirmation" text looks like.
