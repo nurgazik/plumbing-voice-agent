@@ -9,7 +9,7 @@
     max_words: 130
     conversation:
       - role: user
-        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+        content: "There's a slow drip under my kitchen sink. I shut the valve under there and it's stopped now."
       - role: assistant
         content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
       - role: user
@@ -124,7 +124,7 @@
     max_words: 130
     conversation:
       - role: user
-        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+        content: "There's a slow drip under my kitchen sink. I shut the valve under there and it's stopped now."
       - role: assistant
         content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
       - role: user

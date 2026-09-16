@@ -4,7 +4,7 @@ The one file that changes every session. Read it at session start; update it bef
 
 ## Current step
 
-Step 3, quote by SMS. Built 2026-09-14: 7 eval cases (`evals/cases/quote.yaml`), prompt with consent-then-quote, `quotes` table (migration 0003), n8n `send_quote` workflow (deterministic, band from the rules via `workflows/build.js`), footer with the real entity and address, pushed to Retell. Suite 68/68. Verified by a real call 2026-09-15 01:23 UTC: photo retry path, vision on a fresh photo, consent asked verbatim, send_quote sent one text (quotes row: sent, consent timestamp), band spoken exactly as returned. Step 3 done pending Ray's confirmation that the text arrived. Re-triage from caller answers plus photo added 2026-09-15 (`triage.after_photo`, 7 cases), suite 82/82, pushed.
+Step 3, quote by SMS. Built 2026-09-14: 7 eval cases (`evals/cases/quote.yaml`), prompt with consent-then-quote, `quotes` table (migration 0003), n8n `send_quote` workflow (deterministic, band from the rules via `workflows/build.js`), footer with the real entity and address, pushed to Retell. Suite 68/68. Verified by a real call 2026-09-15 01:23 UTC: photo retry path, vision on a fresh photo, consent asked verbatim, send_quote sent one text (quotes row: sent, consent timestamp), band spoken exactly as returned. Step 3 done pending Ray's confirmation that the text arrived. Re-triage from caller answers plus photo added 2026-09-15 (`triage.after_photo`, 7 cases). Emergency fixes from the second real call added the same day (3 cases). Suite 88/88, pushed.
 
 Step 2 history: photo loop. Backend verified live 2026-09-13. Eval cases written and the prompt updated to the photo flow 2026-09-14; suite green (54/54). Pushed to Retell 2026-09-14 with `get_photo_analysis` wired to n8n. Twilio number connected to Retell over a SIP trunk 2026-09-14 (trunk TKa13bad50ff656a7f39aa3c41b274ff1c, Retell number type custom, bound to the agent; `sms_url` still the n8n MMS webhook). First real call 2026-09-14 20:50 UTC: full flow worked, photo used live, photo row stamped with the call id. Step 2 done pending the backlog items below.
 
@@ -23,7 +23,7 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- UNVERIFIED, waiting on credits: emergency fixes from the 2026-09-15 real call (rules: `callback_if_not_stopped`, `safety_instructions.caller_cannot_act`, `escalation.never_say`; prompt: apartment surfacing late switches to strata guidance, cannot-act branch, never "on the way", bucket is not a shutoff, close promises a text only after a consent yes; evals: "on the way" checks on every emergency case, three new emergency cases, digit check now "no digits the caller did not say", closing rubric no longer expects a text promise without consent, supply_line_leak note and urgent definition clarified so a closed valve stays routine). Last full run before the outage: 82 pass, 6 fail, the six addressed by these edits but not re-run.
+- Live check of the emergency fixes from the 2026-09-15 call: an apartment caller who cannot find a shutoff should hear the building-management line, never "on the way", and a close that says stay out of the water rather than keep it off.
 - Voice: Ray dislikes cartesia-Emily. Candidates with previews are in the 2026-09-15 chat; change `voice_id` in `agent/settings.json` and push.
 
 - Live check of the re-triage rule: a call where the valve will not close and the photo shows the supply side should get the "treating this as urgent" sentence, severity urgent on the quotes row, and the morning callback line at the close. Any photo call also re-checks the vision workflow.
@@ -34,7 +34,7 @@ The eval set for a step is written before the step is built.
 
 ## Blockers
 
-- Anthropic API credit balance is empty (2026-09-15, "credit balance too low", status 400). Blocks the eval suite, therefore every push, and the live photo analysis in n8n (same key). Ray to top up at console.anthropic.com Plans & Billing. Then `npm run push` to verify and deploy the unverified changes below. The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
+None. (Anthropic credits ran out mid-session 2026-09-15 and were topped up; the eval suite and the n8n vision call share that key, so an empty balance stops both.) The A2P 10DLC campaign (brand 1260794 B.C. LTD, Dry Run Plumbing named as the product, not a DBA) was approved 2026-09-13, so SMS and MMS are unlocked. Twilio credentials live in `.env`.
 
 ## Owed before later steps
 

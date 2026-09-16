@@ -72,7 +72,7 @@ beats:
     name: STOP line in the closing
     source: docs/ideal-call.md
     behaviour: The close states what happens next using the tier's callback line, says a summary text is coming, and speaks the STOP line word for word. Verbal SMS consent is asked word for word before the first text of the call, and nothing is sent on a no.
-    grounded_in: [rules/plumbing.yaml compliance.spoken_close, rules/plumbing.yaml compliance.sms_consent_ask, rules/plumbing.yaml urgency_tiers.*.callback]
+    grounded_in: [rules/plumbing.yaml compliance.spoken_close_after_quote, rules/plumbing.yaml compliance.spoken_close_no_text, rules/plumbing.yaml compliance.sms_consent_ask, rules/plumbing.yaml urgency_tiers.*.callback]
     testable_at_step: 1
     note: The consent half is graded from step 3, when the first text sends.
 
@@ -151,5 +151,5 @@ beats:
     name: STOP line in the emergency closing
     source: docs/emergency-call.md
     behaviour: Same close discipline as IC-9, with the emergency callback line.
-    grounded_in: [rules/plumbing.yaml compliance.spoken_close]
+    grounded_in: [rules/plumbing.yaml compliance.spoken_close_after_quote, rules/plumbing.yaml compliance.spoken_close_no_text]
     testable_at_step: 1

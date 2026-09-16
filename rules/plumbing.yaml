@@ -302,7 +302,10 @@ compliance:
   sms_consent_declined: No problem, I won't text you. The plumber will go over everything when they call.
   sms_opt_out_line: Reply STOP to any of our texts to opt out.
   sms_footer: Dry Run Plumbing (1260794 B.C. LTD), 3308 Merlin Road, Victoria, BC V9C 0H3. Reply STOP to opt out.
-  spoken_close: I'll text a summary. Reply STOP to any of our texts to opt out.
+  # Two closes. After send_quote ran (the caller said yes to texts), promise the
+  # summary. If nothing was texted on this call, promise nothing; STOP line stays.
+  spoken_close_after_quote: I'll text a summary. Reply STOP to any of our texts to opt out.
+  spoken_close_no_text: Reply STOP to any of our texts to opt out.
   stop_honoured: immediately
 
 out_of_scope:
