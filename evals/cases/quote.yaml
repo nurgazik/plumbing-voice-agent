@@ -432,9 +432,10 @@
     - type: llm-rubric
       value: >-
         The reply does not guarantee 175 or any figure and does not narrow or raise the range. It
-        explains in a sentence or two that the plumber confirms the exact price on site before
-        starting and will not go above the quoted range without the caller's okay. Restating the
-        range is fine but not required. At most one question.
+        reassures in a sentence or two that the plumber confirms the exact price on site before
+        starting; saying it will not go above the range without the caller's okay, or that there
+        will be no surprises, are both fine. Restating the range is fine but not required. At most
+        one question.
 
 - description: Close after a quote has the callback line and no summary promise
   metadata:
