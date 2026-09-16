@@ -8,6 +8,7 @@
   "max_tokens": 300,
   "voice_id": "cartesia-Bing",
   "begin_message_delay_ms": 800,
+  "interruption_sensitivity": 0.5,
   "language": "en-US",
   "begin_message": "Thanks for calling Dry Run Plumbing's after-hours line. Quick heads up, this call is recorded for quality and to help with your quote, and you're speaking with an AI assistant. How can I help?",
   "tool_timeout_ms": 15000

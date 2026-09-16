@@ -132,6 +132,8 @@ async function main() {
     language: settings.language,
     // Wait before the opener so a caller's "hello?" does not cut off the disclosures (Retell: 0 to 5000 ms).
     begin_message_delay_ms: settings.begin_message_delay_ms ?? 0,
+    // How much caller audio stops the agent mid-sentence (Retell: 0 never, 1 a syllable). Protects the disclosures.
+    interruption_sensitivity: settings.interruption_sensitivity ?? 1,
   };
   if (env.N8N_WEBHOOK_BASE_URL) agentPayload.webhook_url = `${webhookBase}/retell-events`;
 
@@ -181,7 +183,7 @@ async function main() {
   const agent = await retell<any>("GET", `/get-agent/${agentId}`, key);
   const llm = await retell<any>("GET", `/get-retell-llm/${llmId}`, key);
   const promptMatches = llm.general_prompt === prompt;
-  console.log(`  agent "${agent.agent_name}" v${agent.version}, voice ${agent.voice_id}, opener delay ${agent.begin_message_delay_ms ?? 0} ms, engine ${agent.response_engine?.type} -> ${agent.response_engine?.llm_id}`);
+  console.log(`  agent "${agent.agent_name}" v${agent.version}, voice ${agent.voice_id}, opener delay ${agent.begin_message_delay_ms ?? 0} ms, interruption sensitivity ${agent.interruption_sensitivity ?? 1}, engine ${agent.response_engine?.type} -> ${agent.response_engine?.llm_id}`);
   console.log(`  llm model ${llm.model}, temperature ${llm.model_temperature}, prompt matches repo: ${promptMatches}`);
   if (!promptMatches) throw new Error("Deployed prompt does not match the rendered prompt");
 
