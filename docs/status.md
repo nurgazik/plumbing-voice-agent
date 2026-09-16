@@ -23,7 +23,7 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- UNVERIFIED, one eval run needed (Ray's go, ~$1): honest after-quote close, up-to-two questions to pin the job type, callback line only at the close, no tool calls on the emergency path, close immediately when the caller has to go. Last run: 90 pass, 2 fail (emergency close dropped the STOP line when the caller asked "what happens now?"); the close is now an explicit three-part sequence, not re-run. Then push.
+- UNVERIFIED, one eval run needed (Ray's go, ~$1): honest after-quote close, up-to-two questions to pin the job type, callback line only at the close, no tool calls on the emergency path, close immediately when the caller has to go. Last two runs: 90 pass, 2 fail, the same emergency close case dropping the STOP line (once reciting the recording disclosure instead). Cause: the close pointed at rules keys `spoken_close_*`, and the model picked the wrong compliance line. The STOP line is now quoted literally in the prompt. Not re-run. Then push.
 
 - Emergency fixes verified live 2026-09-16 (house caller who cannot act). Not yet exercised live: the apartment branch (building-management line).
 
