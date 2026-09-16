@@ -22,3 +22,35 @@
   assert:
     - type: llm-rubric
       value: The reply confirms the call is recorded, in one or two short sentences, then invites the caller to describe the problem or asks how it can help.
+
+# From the 2026-09-16 call: the caller spoke over the opener and Retell cut it off before the
+# disclosures were finished. The agent must say them again before anything else.
+- description: Opener cut off by the caller, disclosure is repeated first
+  metadata:
+    beats: [IC-1, EC-1]
+  vars:
+    max_words: 85
+    conversation:
+      - role: assistant
+        content: "Thanks for calling Dry Run Plumbing's after-hours"
+      - role: user
+        content: "Hello?"
+      - role: assistant
+        content: "line. Quick heads up, this call is recorded for quality and to"
+      - role: user
+        content: "Hi, I have a leaking faucet in the kitchen."
+  assert:
+    - type: icontains
+      value: "recorded"
+    - type: icontains
+      value: "AI assistant"
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: llm-rubric
+      value: >-
+        The reply starts by saying, in full, that the call is recorded for quality and to help with
+        the quote and that the caller is speaking with an AI assistant. It does not apologise or
+        mention being interrupted. It then carries on normally: acknowledges the faucet and asks
+        exactly one question, either how it can help or the first triage question (slow drip or
+        running). No price, no photo request.

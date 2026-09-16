@@ -23,6 +23,8 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
+- UNVERIFIED, needs a run (Ray's go): repeat the disclosure when the opener was cut off (rule now a literal first-turn check; first wording failed 2/2), plus `begin_message_delay_ms` 800 wired through settings and push.ts. Last full run 92 pass, 2 fail, both the new disclosure case. Vision prompt still allows "we'll send someone out" in its spoken summary; proposed, not approved.
+
 - Live check of the 2026-09-16 changes: a routine call with the ambiguous sink photo should get the drain-or-supply question and end with "I've texted you the quote" and no summary promise; an emergency close must have the STOP line and no "get someone to you".
 
 - Emergency fixes verified live 2026-09-16 (house caller who cannot act). Not yet exercised live: the apartment branch (building-management line).
