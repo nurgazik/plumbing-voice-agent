@@ -23,7 +23,6 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
-- Live check: talk over the opener on a call. With the 800 ms delay and interruption sensitivity 0.5 the disclosure should finish; if it still gets cut, the prompt's repeat rule is a best effort only (see `evals/known-limitations/`).
 - Vision prompt still allows "we'll send someone out" in its spoken summary; proposed, not approved.
 
 - Live check of the 2026-09-16 changes: a routine call with the ambiguous sink photo should get the drain-or-supply question and end with "I've texted you the quote" and no summary promise; an emergency close must have the STOP line and no "get someone to you".
