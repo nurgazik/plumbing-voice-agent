@@ -435,3 +435,81 @@
         explains in a sentence or two that the plumber confirms the exact price on site before
         starting and will not go above the quoted range without the caller's okay. Restating the
         range is fine but not required. At most one question.
+
+- description: Close after a quote has the callback line and no summary promise
+  metadata:
+    beats: [IC-9, EC-8]
+  vars:
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/p-trap-leak.analysis.json
+      - role: assistant
+        content: "Looks like the joint at the P-trap is seeping. That's the curved pipe under the drain, and it's a straightforward fix. Keep that valve off tonight."
+      - role: user
+        content: "Okay, good to know."
+      - role: assistant
+        content: "One more thing before I text you. This is Dry Run Plumbing. If you say yes, we'll text you the quote, your appointment confirmation, a summary of this call, and one follow-up after the visit, so about four messages. Message and data rates may apply, and you can reply STOP any time to opt out. Is that okay?"
+      - role: user
+        content: "Yeah, that's fine."
+      - role: assistant
+        content:
+          - type: text
+            text: "Great, sending it now."
+          - type: tool_use
+            id: toolu_02
+            name: send_quote
+            input: {job_type: p_trap_leak, severity: routine, summary: "Slow drip at the P-trap joint under the kitchen sink, valve shut."}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_02
+            content: '{"sent": true, "job_type": "p_trap_leak", "label": "Leak at the P-trap or drain joint under a sink", "band_min_cad": 175, "band_max_cad": 350, "service_call_fee_cad": 120, "message_sid": "SM0000000000000000000000000000test"}'
+      - role: assistant
+        content: "Sent. For this kind of repair it's typically 175 to 350 dollars, including the service call fee, based on the photo and what you've told me. The plumber confirms the price on site before any work starts. Is this the best number to call you back on?"
+      - role: user
+        content: "Yep, that's correct."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: icontains
+      value: "next business day"
+    - type: icontains
+      value: "I've texted you the quote"
+    - type: icontains
+      value: "Reply STOP to any of our texts to opt out"
+    - type: not-icontains
+      value: "summary"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: llm-rubric
+      value: >-
+        The reply closes the call: the routine callback line (a plumber calls during business
+        hours on the next business day), the line that the quote has been texted, the STOP line,
+        and a short sign-off. It does not promise a summary text, does not state the price again,
+        and asks no further question.

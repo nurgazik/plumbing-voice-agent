@@ -12,6 +12,10 @@
       - role: user
         content: "I tried, they're stuck, I can't turn them."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -33,6 +37,10 @@
       - role: user
         content: "Help, water is pouring out from under my bathroom sink, like actually pouring, the floor's flooding."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -49,6 +57,10 @@
       - role: user
         content: "My water heater's leaking a bit and also, I don't know if this matters, but it kind of smells like gas down here."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -68,6 +80,10 @@
       - role: user
         content: "A hose behind my washer split and it was spraying everywhere, but I got the taps turned and it's stopped now. It's 2 in the morning though, can someone come now?"
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -95,6 +111,10 @@
       - role: user
         content: "Okay... found it... it's off. It's slowing down."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -131,6 +151,10 @@
       - role: user
         content: "Yes. So what happens now?"
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -167,6 +191,10 @@
       - role: user
         content: "I can't find it anywhere. I'm in apartment seventeen, first floor."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -202,6 +230,10 @@
       - role: user
         content: "No. I don't know. I'm in a wheelchair and I'm alone, I can't get down there or go looking."
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains
@@ -254,6 +286,10 @@
       - role: user
         content: "Yes. So what now?"
   assert:
+    - type: javascript
+      # No tool exists for the emergency path yet; any tool call here is wrong.
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
     - type: not-icontains
       value: "on the way"
     - type: not-icontains

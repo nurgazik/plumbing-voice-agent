@@ -23,6 +23,8 @@ The eval set for a step is written before the step is built.
 
 ## Next actions
 
+- UNVERIFIED, one eval run needed (Ray's go, ~$1): honest after-quote close, up-to-two questions to pin the job type, callback line only at the close, no tool calls on the emergency path, close immediately when the caller has to go. Last run: 87 pass, 5 fail, the five addressed but not re-run. Then push.
+
 - Emergency fixes verified live 2026-09-16 (house caller who cannot act). Not yet exercised live: the apartment branch (building-management line).
 
 - Live check of the re-triage rule: a call where the valve will not close and the photo shows the supply side should get the "treating this as urgent" sentence, severity urgent on the quotes row, and the morning callback line at the close. Any photo call also re-checks the vision workflow.

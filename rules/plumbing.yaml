@@ -304,7 +304,7 @@ compliance:
   sms_footer: Dry Run Plumbing (1260794 B.C. LTD), 3308 Merlin Road, Victoria, BC V9C 0H3. Reply STOP to opt out.
   # Two closes. After send_quote ran (the caller said yes to texts), promise the
   # summary. If nothing was texted on this call, promise nothing; STOP line stays.
-  spoken_close_after_quote: I'll text a summary. Reply STOP to any of our texts to opt out.
+  spoken_close_after_quote: I've texted you the quote. Reply STOP to any of our texts to opt out.   # "I'll text a summary" returns at step 5, when a summary is actually sent
   spoken_close_no_text: Reply STOP to any of our texts to opt out.
   stop_honoured: immediately
 

@@ -11,7 +11,7 @@ node names a credential ("Twilio Dry Run", "Anthropic Dry Run", "Supabase Dry Ru
 | File | n8n workflow | Trigger | Step |
 |---|---|---|---|
 | inbound-photo.sdk.ts | Dry Run: inbound photo (p7DbdzNA9f9BSQf9) | Twilio inbound message webhook `/webhook/twilio-inbound-mms` | 2 |
-| get-photo-analysis.sdk.ts | Dry Run: tool get_photo_analysis (TuGu1xSgZ68Srik1) | Retell custom function webhook `/webhook/tools/get-photo-analysis` | 2 |
+| get-photo-analysis.sdk.ts | Dry Run: tool get_photo_analysis (TuGu1xSgZ68Srik1) | Retell custom function webhook `/webhook/tools/get-photo-analysis`; photos count from 5 min before the call started | 2 |
 | send-quote.sdk.ts | Dry Run: tool send_quote (qWT50n728T002f3t) | Retell custom function webhook `/webhook/tools/send-quote` | 3 |
 
 `analyze-photo.prompt.md` is the vision system prompt, kept here so it can be

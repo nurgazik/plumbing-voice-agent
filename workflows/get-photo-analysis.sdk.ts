@@ -119,7 +119,7 @@ const respondNone = node({
   }
 });
 
-const note = sticky('get_photo_analysis (build step 2). Retell calls this when the agent uses the tool. Looks up the newest analyzed photo from the caller number in the last 30 minutes and returns it, or says nothing has arrived. Source of truth: workflows/get-photo-analysis.sdk.ts in the repo.', { position: [0, -300], width: 520, height: 120 });
+const note = sticky('get_photo_analysis (build step 2). Retell calls this when the agent uses the tool. Looks up the newest analyzed photo from the caller number since five minutes before the call started (30 minutes back if Retell sends no start time) and returns it, or says nothing has arrived. Source of truth: workflows/get-photo-analysis.sdk.ts in the repo.', { position: [0, -300], width: 520, height: 120 });
 
 export default workflow('dry-run-get-photo-analysis', 'Dry Run: tool get_photo_analysis')
   .add(note)

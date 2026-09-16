@@ -140,6 +140,9 @@
       # The only number allowed is the $120 service call fee from the rules.
       value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
       metric: no_repair_price
+    - type: not-icontains
+      # The callback plan is said once, at the close.
+      value: "next business day"
     - type: llm-rubric
       value: >-
         The reply uses the photo result honestly: it says it can see the pipes or trap under the
@@ -148,6 +151,66 @@
         the photo to the caller's description of a drip. It does not state any repair price or
         range, in digits or in words. It ends with at most one question or moves to the next intake
         step.
+    - type: not-contains
+      value: "$"
+
+- description: Vague answer after an unclear photo gets the drain-or-supply question
+  metadata:
+    beats: [IC-5, IC-6]
+  vars:
+    max_words: 70
+    conversation:
+      - role: user
+        content: "There's a slow drip under my kitchen sink. I shut the valve, it's mostly stopped."
+      - role: assistant
+        content: "Good, that keeps it out of emergency territory, so nobody needs to come out tonight. Can I get your name?"
+      - role: user
+        content: "Marcus Lee."
+      - role: assistant
+        content: "Thanks Marcus. And the address where the sink is?"
+      - role: user
+        content: "2288 West Broadway, unit 305, Vancouver."
+      - role: assistant
+        content: "Thanks. If you can text a photo of the leak to this same number, I can take a look right now and get a better idea of what's going on before anyone comes out. Just let me know once it's sent."
+      - role: user
+        content: "Okay... yeah, okay, sent it."
+      - role: assistant
+        content:
+          - type: text
+            text: "Got it, one moment while I take a look."
+          - type: tool_use
+            id: toolu_01
+            name: get_photo_analysis
+            input: {}
+      - role: user
+        content:
+          - type: tool_result
+            tool_use_id: toolu_01
+            content: file://fixtures/sink-under-cabinet.analysis.json
+      - role: assistant
+        content: "I can see the pipes under your sink, but I'm not seeing the leak in the photo. Where exactly is the water coming from?"
+      - role: user
+        content: "It's kind of behind the left pipe. It's hard to take a photo of that. It's slowly dripping, just behind it."
+  assert:
+    - type: javascript
+      value: "!output.includes('\"type\":\"tool_use\"')"
+      metric: no_tool_call
+    - type: javascript
+      value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
+      metric: no_repair_price
+    - type: not-icontains
+      value: "next business day"
+    - type: not-icontains
+      value: "first thing in the morning"
+    - type: not-icontains
+      value: "One more thing before I text you"
+    - type: llm-rubric
+      value: >-
+        The reply does not give up on the job type. It asks exactly one plain-words question that
+        offers the two sides: is the water coming from the curved drain pipe or a drain joint, or
+        from the hoses or small valves that feed the tap. It does not name a fault as confirmed,
+        does not state a price, does not ask the SMS consent question yet, and does not say when a
+        plumber will call.
     - type: not-contains
       value: "$"
 
@@ -191,6 +254,9 @@
     - type: javascript
       value: "!/\\b(?!120\\b)\\d{2,4}\\b/.test(output)"
       metric: no_repair_price
+    - type: not-icontains
+      # The callback plan is said once, at the close.
+      value: "next business day"
     - type: llm-rubric
       value: >-
         The reply tells the caller what the photo shows: the joint at the P-trap, the curved pipe
