@@ -1,6 +1,6 @@
 # Dry Run Plumbing
 
-A voice agent that does more than talk. While the caller is still on the line it can take a photo by text, look at it, and use what it sees in the next thing it says. The voice call and the text thread are one conversation, not two tickets someone reconciles in the morning.
+A voice agent that does more than talk. While the caller is still on the line it can take a photo by text, look at it, and use what it sees in the next thing it says. The voice call and the text thread are one conversation, so there is nothing left to match up afterwards.
 
 It is dressed as the after-hours receptionist for a plumbing company: it triages the problem, reads the photo, and sends a preliminary quote by SMS before hanging up. The company is fictional. The system is real and callable, with a Canadian phone number, a live Retell agent, n8n workflows, a Supabase database, and real texts going out through Twilio.
 
@@ -38,7 +38,7 @@ The prompt is written so the agent only claims what is true of the system today.
 
 Three layers, one loop.
 
-**Conversation** — Retell runs the live call: speech to text, turn-taking, text to speech, tool calling. Claude Haiku 4.5 handles turns through Retell's built-in LLM. The rules file is rendered into the system prompt at push time, not fetched at call time.
+**Conversation** — Retell runs the live call: speech to text, turn-taking, text to speech, tool calling. Claude Haiku 4.5 handles turns through Retell's built-in LLM. The rules file is baked into the system prompt at push time, so there is no lookup to wait on during the call.
 
 **Actions** — n8n Cloud. Every tool call from the agent and every Retell or Twilio webhook lands on an n8n webhook. n8n calls Claude Sonnet for photo analysis, builds quotes deterministically from the rules file, and talks to Twilio, Supabase, Cal.com and HubSpot.
 
@@ -54,7 +54,7 @@ The loop: rules load into the prompt → the agent calls a tool → n8n does the
 
 Two things read it. `agent/push.ts` renders it into the system prompt before deploying to Retell. `workflows/build.js` renders the subset the workflows need into each n8n workflow file, between marker comments, so a price band has exactly one source.
 
-The reason for the split is a lesson that cost a debugging session and is recorded in `docs/decisions.md`: **when the prompt and the rules file disagree, the model follows the rules file.** Anything the agent must get right belongs in structured data, not in prose asking it nicely. Anything it must say word for word is protected by structure — the opener lives in Retell's own settings, not in the prompt.
+The reason for the split is a lesson that cost a debugging session and is recorded in `docs/decisions.md`: **when the prompt and the rules file disagree, the model follows the rules file.** Anything the agent has to get right belongs in structured data the model reads as fact. Anything it has to say word for word belongs somewhere it has no opportunity to skip: the opener lives in Retell's own settings, where it is spoken before the model gets a turn at all.
 
 ## Evals
 
@@ -62,7 +62,7 @@ The reason for the split is a lesson that cost a debugging session and is record
 
 `npm run evals`
 
-The eval suite grades behaviour, not wording. A case is a frozen transcript that stops on a caller turn; the model writes exactly one reply; assertions grade that reply. Some are deterministic code checks (at most one question mark, no markdown, no dollar figure on the emergency path). Some are `llm-rubric` assertions where Claude Sonnet judges Haiku's answer against a standard written in English. Every case runs twice, because a turn that passes half the time is a failing turn.
+The eval suite grades what the agent did, leaving it free to phrase things however it likes. A case is a frozen transcript that stops on a caller turn; the model writes exactly one reply; assertions grade that reply. Some are deterministic code checks (at most one question mark, no markdown, no dollar figure on the emergency path). Some are `llm-rubric` assertions where Claude Sonnet judges Haiku's answer against a standard written in English. Every case runs twice, because a turn that passes half the time is a failing turn.
 
 `evals/beats.yaml` is the registry of every graded behaviour across both spec calls — what it is, which file and key grounds it, and the build step that makes it testable. Cases tag the beats they cover, and `node evals/coverage.js` reports behaviours that are testable now but have no case.
 
