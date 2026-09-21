@@ -1,10 +1,10 @@
 # Dry Run Plumbing
 
-An AI receptionist that answers the after-hours line for a plumbing company, triages the problem, looks at a photo the caller texts in mid-call, and sends a preliminary quote by SMS before hanging up.
+A voice agent that does more than talk. While the caller is still on the line it can take a photo by text, look at it, and use what it sees in the next thing it says. The voice call and the text thread are one conversation, not two tickets someone reconciles in the morning.
 
-The plumbing company is fictional. The system is real and callable — a Canadian phone number, a live Retell agent, n8n workflows, a Supabase database, and real texts going out through Twilio.
+It is dressed as the after-hours receptionist for a plumbing company: it triages the problem, reads the photo, and sends a preliminary quote by SMS before hanging up. The company is fictional. The system is real and callable, with a Canadian phone number, a live Retell agent, n8n workflows, a Supabase database, and real texts going out through Twilio.
 
-The plumbing persona is the costume. The product underneath is a rules-driven intake agent that could wear any small-business process: hours, urgency tiers, job types, price bands and escalation all live in one versioned YAML file, not in prompt prose.
+None of it is specific to plumbing. The intake logic runs off a rules file, so the same agent handles any call where someone describes a problem, shows it, and wants an answer before they hang up. Hours, urgency tiers, job types, price bands and escalation live in one versioned YAML file rather than in prompt prose, and swapping that file swaps the business.
 
 Read the case study: [nurgazy.com/work/dry-run-plumbing](https://nurgazy.com/work/dry-run-plumbing)
 
