@@ -20,18 +20,17 @@ Two triage questions settle the urgency tier. Intake is collected one field per 
 
 ## Status
 
-Built and verified by real calls:
+Live on the number and verified by real calls:
 
-| Step | What | State |
-|---|---|---|
-| 1 | Intake and triage, no tools | Live |
-| 2 | Photo loop — MMS in, Sonnet vision, `get_photo_analysis` | Live |
-| 3 | Quote by SMS via `send_quote`, consent asked first | Live |
-| 4 | Booking via Cal.com | Not started |
-| 5 | After-call summary, CRM, follow-up | Not started |
-| 7 | Escalation to an on-call number | Not started |
+- Intake and triage, with the urgency tier settled from the caller's own answers
+- The photo loop: inbound MMS, Claude Sonnet vision, `get_photo_analysis` answering mid-call
+- Re-triage once the photo lands, since a picture can raise the tier but never lower it
+- Quote by SMS through `send_quote`, with verbal consent captured on the recording first
+- The emergency path: safety instruction before intake, no photo, no price
 
-So: a caller can be triaged, send a photo, hear what it shows, and receive a quote. Nothing is booked yet and no human is actually notified on an emergency. The agent is built to say only what's true at the current step.
+Next, in order: booking through Cal.com, the after-call summary and CRM write, then escalation to an on-call number. Each one is an n8n workflow behind a tool that is already defined in `agent/tools.json`, so the intake logic does not change as they land.
+
+The prompt is written so the agent only claims what is true of the system today.
 
 ## Architecture
 
