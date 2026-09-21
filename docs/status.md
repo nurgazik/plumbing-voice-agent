@@ -2,7 +2,18 @@
 
 The one file that changes every session. Read it at session start; update it before ending. Stable facts live in `CLAUDE.md`; the why behind choices lives in `docs/decisions.md`.
 
-Last updated 2026-09-16. Ray is pausing this project for a while; this file is written for a cold restart.
+Last updated 2026-09-21. The build is still paused at step 3; the work since has been packaging it as a portfolio piece, not extending the agent.
+
+## Open right now: publishing
+
+Two outputs, both built and committed locally, neither published. See the 2026-09-21 entries in `docs/decisions.md`.
+
+1. **This repo goes public** as `github.com/nurgazik/plumbing-voice-agent`, MIT. README rewritten for a stranger, `LICENSE` added, `docs/architecture.svg` and `docs/evals.svg` embedded. Not yet pushed: no git remote exists, and creating a public repo is Ray's call. The mailing address in `rules/plumbing.yaml` ships with it, decided deliberately.
+2. **Case study** at `nurgazy.com/work/dry-run-plumbing`, committed in `~/Developer/portfolio_site` (`be52e0b`), not deployed. Leads with a real call recording as a two-channel waveform; adds `audio` and `callout` section types and a click-to-reveal for the demo number.
+
+Owed before the page is public, all in the Retell dashboard: auto recharge **off** with a fixed float (this is the only hard spend cap), `Allowed Inbound Countries` US and CA, concurrency down from the default 20.
+
+Not yet verified by a human: the waveform actually rendering, and the page at phone width. Headless Chrome cannot decode audio, so both need a real browser.
 
 ## Where things stand
 
