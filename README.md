@@ -1,31 +1,98 @@
 # Dry Run Plumbing
 
-An AI receptionist for a fictional plumbing company. Call the number, describe a plumbing problem, text a photo mid-call, get a preliminary quote and a booking, and receive a summary afterward.
+An AI receptionist that answers the after-hours line for a plumbing company, triages the problem, looks at a photo the caller texts in mid-call, and sends a preliminary quote by SMS before hanging up.
 
-The plumbing persona is the costume. The product is a rules-driven intake agent that could wear any small-business process.
+The plumbing company is fictional. The system is real and callable — a Canadian phone number, a live Retell agent, n8n workflows, a Supabase database, and real texts going out through Twilio.
 
-Built with Retell, Claude, n8n, Supabase, Twilio, Cal.com, and HubSpot. Evals in Promptfoo, traces in Langfuse.
+The plumbing persona is the costume. The product underneath is a rules-driven intake agent that could wear any small-business process: hours, urgency tiers, job types, price bands and escalation all live in one versioned YAML file, not in prompt prose.
 
-Start with `CLAUDE.md` for the shape of the project, `docs/ideal-call.md` for the one call we want, and `docs/emergency-call.md` for the escalation path.
+Read the case study: [nurgazy.com/work/dry-run-plumbing](https://nurgazy.com/work/dry-run-plumbing)
 
-## Pushing the agent to Retell
+## What a call looks like
+
+> **Agent:** Thanks for calling Dry Run Plumbing's after-hours line. Quick heads up, this call is recorded and you're speaking with an AI assistant. How can I help?
+> **Caller:** There's water dripping under my kitchen sink, I've got a bucket under it right now.
+> **Agent:** Sorry to hear that. Is it a slow drip, or is water actually running?
+
+Two triage questions settle the urgency tier. Intake is collected one field per turn. The agent explains why a photo helps, waits for the caller to say it's sent, then calls a tool that returns what Claude Sonnet saw in the image. The quote comes from a price band in the rules file — no model picks the number — and goes out by SMS after verbal consent is captured on the recording.
+
+`docs/ideal-call.md` is the specification: that call written as a two-column transcript, what is said beside what the system does, plus the ten beats the evals grade. `docs/emergency-call.md` is the second spec — burst pipe, safety instruction before intake, no photo, no price.
+
+## Status
+
+Built and verified by real calls:
+
+| Step | What | State |
+|---|---|---|
+| 1 | Intake and triage, no tools | Live |
+| 2 | Photo loop — MMS in, Sonnet vision, `get_photo_analysis` | Live |
+| 3 | Quote by SMS via `send_quote`, consent asked first | Live |
+| 4 | Booking via Cal.com | Not started |
+| 5 | After-call summary, CRM, follow-up | Not started |
+| 7 | Escalation to an on-call number | Not started |
+
+So: a caller can be triaged, send a photo, hear what it shows, and receive a quote. Nothing is booked yet and no human is actually notified on an emergency. The agent is built to say only what's true at the current step.
+
+## Architecture
+
+Three layers, one loop.
+
+**Conversation** — Retell runs the live call: speech to text, turn-taking, text to speech, tool calling. Claude Haiku 4.5 handles turns through Retell's built-in LLM. The rules file is rendered into the system prompt at push time, not fetched at call time.
+
+**Actions** — n8n Cloud. Every tool call from the agent and every Retell or Twilio webhook lands on an n8n webhook. n8n calls Claude Sonnet for photo analysis, builds quotes deterministically from the rules file, and talks to Twilio, Supabase, Cal.com and HubSpot.
+
+**Memory** — Supabase Postgres: callers, calls, photos, quotes, bookings. Langfuse holds traces.
+
+The loop: rules load into the prompt → the agent calls a tool → n8n does the work and reads or writes Supabase → the result returns as the tool's response → the agent says it out loud.
+
+`docs/architecture.md` has the detail, including data routing and the compliance surface.
+
+## The rules file
+
+`rules/plumbing.yaml` holds the business: hours, on-call, urgency tiers, job types with price bands, escalation rules, compliance lines. `rules/schema.json` says what a valid rules file must contain.
+
+Two things read it. `agent/push.ts` renders it into the system prompt before deploying to Retell. `workflows/build.js` renders the subset the workflows need into each n8n workflow file, between marker comments, so a price band has exactly one source.
+
+The reason for the split is a lesson that cost a debugging session and is recorded in `docs/decisions.md`: **when the prompt and the rules file disagree, the model follows the rules file.** Anything the agent must get right belongs in structured data, not in prose asking it nicely. Anything it must say word for word is protected by structure — the opener lives in Retell's own settings, not in the prompt.
+
+## Evals
+
+`npm run evals`
+
+The eval suite grades behaviour, not wording. A case is a frozen transcript that stops on a caller turn; the model writes exactly one reply; assertions grade that reply. Some are deterministic code checks (at most one question mark, no markdown, no dollar figure on the emergency path). Some are `llm-rubric` assertions where Claude Sonnet judges Haiku's answer against a standard written in English. Every case runs twice, because a turn that passes half the time is a failing turn.
+
+`evals/beats.yaml` is the registry of every graded behaviour across both spec calls — what it is, which file and key grounds it, and the build step that makes it testable. Cases tag the beats they cover, and `node evals/coverage.js` reports behaviours that are testable now but have no case.
+
+`agent/push.ts` runs the suite and refuses to deploy on a failure. Every defect found on a real call becomes a case before it's fixed.
+
+## Layout
 
 ```
-node agent/push.ts --dry-run   # render, validate, show payloads
-node agent/push.ts             # render, validate, run evals, push
+agent/       prompt, tool definitions, settings, and the push script
+rules/       plumbing.yaml (the business) and schema.json (what's valid)
+workflows/   n8n workflows as code, one file per workflow
+supabase/    schema as SQL migrations
+evals/       promptfoo config, cases, beats registry, fixtures
+docs/        the specs, architecture, decisions log, status
 ```
 
-Needs `RETELL_API_KEY` in `.env`. The first push creates the Retell LLM and agent and saves their ids to `.env`; later pushes update them in place. The push refuses to deploy if the eval suite fails. Model, temperature, voice, and the opener live in `agent/settings.json`.
+`docs/decisions.md` is one line per non-obvious decision, dated, newest first. `docs/status.md` is where the project actually stands.
 
-## Beats and coverage
-
-`evals/beats.yaml` is the registry of every graded behaviour across the spec calls, with its source, the rule that grounds it, and the build step that makes it testable. Each eval case tags the beats it covers. `node evals/coverage.js` reports beats that are testable now but have no case.
-
-## Running the evals
+## Running it
 
 ```
-cp .env.example .env   # fill in ANTHROPIC_API_KEY
-cd evals
-npx promptfoo@latest eval
-npx promptfoo@latest view
+cp .env.example .env          # fill in the keys you need
+node agent/push.ts --dry-run  # render and validate, touch nothing
+npm run evals                 # run the suite (costs ~$1 in Anthropic credits)
+npm run push                  # render, validate, run evals, deploy on green
 ```
+
+The first push creates the Retell LLM and agent and writes their ids back to `.env`; later pushes update them in place. Model, temperature, voice and the opener live in `agent/settings.json`.
+
+## Stack
+
+Retell · Claude (Haiku for turns, Sonnet for vision) · n8n Cloud · Supabase · Twilio · Cal.com · HubSpot · Promptfoo · Langfuse
+
+## License
+
+MIT. See `LICENSE`.

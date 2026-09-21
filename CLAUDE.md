@@ -92,4 +92,4 @@ web/                      Next.js landing page (later)
 
 Spoken recording disclosure. AI disclosure on request and in the opener. CASL opt-out on every text (STOP). Document US data routing (Retell, Anthropic, n8n, Supabase regions) in `docs/architecture.md`.
 
-Verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask` in the rules file. It is registered with the carriers and published at nurgazy.com/dryrunplumbing/sms; those three must stay identical. The public privacy policy, terms, and opt-in pages are listed in `docs/compliance-pages.md`. `compliance.sms_footer` is still placeholder text and needs the real entity and mailing address before step 3 sends anything.
+Verbal SMS consent before the first text of a call, word for word from `compliance.sms_consent_ask` in the rules file. It is registered with the carriers and published at nurgazy.com/dryrunplumbing/sms; those three must stay identical. The public privacy policy, terms, and opt-in pages are listed in `docs/compliance-pages.md`. `compliance.sms_footer` carries the real sending entity and mailing address, as CASL requires on every commercial text.
