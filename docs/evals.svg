@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1240 800" width="1240" height="800" font-family="ui-sans-serif, -apple-system, BlinkMacSystemFont, 'Segoe UI', Helvetica, Arial, sans-serif">
+  <rect width="1240" height="800" fill="#FAFAF9"/>
+
+  <text x="40" y="46" font-size="21" font-weight="600" fill="#18181B">What the evals grade</text>
+  <text x="40" y="70" font-size="13.5" fill="#71717A">Twenty behaviours drawn from the two spec calls. Each one is a beat; each beat is graded by cases that test it, not by wording.</text>
+  <text x="40" y="92" font-size="13.5" fill="#71717A">46 cases, every one run twice — 92 results. A turn that passes half the time is a failing turn.</text>
+
+  <!-- column headers -->
+  <text x="40" y="146" font-size="12" font-weight="600" fill="#18181B">IDEAL CALL</text>
+  <text x="40" y="164" font-size="11.5" fill="#A1A1AA">docs/ideal-call.md — routine leak, photo, quote</text>
+  <line x1="40" y1="178" x2="610" y2="178" stroke="#D4D4D8" stroke-width="1"/>
+
+  <text x="660" y="146" font-size="12" font-weight="600" fill="#18181B">EMERGENCY CALL</text>
+  <text x="660" y="164" font-size="11.5" fill="#A1A1AA">docs/emergency-call.md — burst pipe, safety first</text>
+  <line x1="660" y1="178" x2="1200" y2="178" stroke="#D4D4D8" stroke-width="1"/>
+
+  <!-- ideal call rows -->
+  <g font-size="12.5">
+    <text x="40" y="210" font-size="11" font-weight="600" fill="#A1A1AA">IC-1</text><text x="96" y="210" fill="#3F3F46">Recording and AI disclosure in the opening</text><rect x="440" y="201" width="16" height="12" rx="2.5" fill="#0D9488"/><text x="466" y="211" font-size="11.5" fill="#52525B">2</text>
+    <text x="40" y="250" font-size="11" font-weight="600" fill="#A1A1AA">IC-2</text><text x="96" y="250" fill="#3F3F46">One question per turn</text><rect x="440" y="241" width="40" height="12" rx="2.5" fill="#0D9488"/><text x="490" y="251" font-size="11.5" fill="#52525B">5</text>
+    <text x="40" y="290" font-size="11" font-weight="600" fill="#A1A1AA">IC-3</text><text x="96" y="290" fill="#3F3F46">Both triage questions before urgency</text><rect x="440" y="281" width="112" height="12" rx="2.5" fill="#0D9488"/><text x="562" y="291" font-size="11.5" fill="#52525B">14</text>
+    <text x="40" y="330" font-size="11" font-weight="600" fill="#A1A1AA">IC-4</text><text x="96" y="330" fill="#3F3F46">Photo requested with a reason</text><rect x="440" y="321" width="24" height="12" rx="2.5" fill="#0D9488"/><text x="474" y="331" font-size="11.5" fill="#52525B">3</text>
+    <text x="40" y="370" font-size="11" font-weight="600" fill="#A1A1AA">IC-5</text><text x="96" y="370" fill="#3F3F46">Photo findings used in the next turn</text><rect x="440" y="361" width="88" height="12" rx="2.5" fill="#0D9488"/><text x="538" y="371" font-size="11.5" fill="#52525B">11</text>
+    <text x="40" y="410" font-size="11" font-weight="600" fill="#A1A1AA">IC-6</text><text x="96" y="410" fill="#3F3F46">Quote inside the rules-file band</text><rect x="440" y="401" width="80" height="12" rx="2.5" fill="#0D9488"/><text x="530" y="411" font-size="11.5" fill="#52525B">10</text>
+    <text x="40" y="450" font-size="11" font-weight="600" fill="#D4D4D8">IC-7</text><text x="96" y="450" fill="#A1A1AA">Booking offered without prompting</text><text x="440" y="450" font-size="11.5" fill="#A1A1AA">not built yet — step 4</text>
+    <text x="40" y="490" font-size="11" font-weight="600" fill="#A1A1AA">IC-8</text><text x="96" y="490" fill="#3F3F46">Policy answered from the rules file only</text><rect x="440" y="481" width="40" height="12" rx="2.5" fill="#0D9488"/><text x="490" y="491" font-size="11.5" fill="#52525B">5</text>
+    <text x="40" y="530" font-size="11" font-weight="600" fill="#A1A1AA">IC-9</text><text x="96" y="530" fill="#3F3F46">STOP line in the closing</text><rect x="440" y="521" width="56" height="12" rx="2.5" fill="#0D9488"/><text x="506" y="531" font-size="11.5" fill="#52525B">7</text>
+    <text x="40" y="570" font-size="11" font-weight="600" fill="#D4D4D8">IC-10</text><text x="96" y="570" fill="#A1A1AA">Summary text within a minute of hangup</text><text x="440" y="570" font-size="11.5" fill="#A1A1AA">after the call, not the prompt</text>
+  </g>
+
+  <!-- emergency call rows -->
+  <g font-size="12.5">
+    <text x="660" y="210" font-size="11" font-weight="600" fill="#A1A1AA">EC-1</text><text x="716" y="210" fill="#3F3F46">Disclosure in the opening</text><rect x="1060" y="201" width="16" height="12" rx="2.5" fill="#0D9488"/><text x="1086" y="211" font-size="11.5" fill="#52525B">2</text>
+    <text x="660" y="250" font-size="11" font-weight="600" fill="#A1A1AA">EC-2</text><text x="716" y="250" fill="#3F3F46">Safety instruction before any intake</text><rect x="1060" y="241" width="40" height="12" rx="2.5" fill="#0D9488"/><text x="1110" y="251" font-size="11.5" fill="#52525B">5</text>
+    <text x="660" y="290" font-size="11" font-weight="600" fill="#A1A1AA">EC-3</text><text x="716" y="290" fill="#3F3F46">Main shutoff when the local valve fails</text><rect x="1060" y="281" width="24" height="12" rx="2.5" fill="#0D9488"/><text x="1094" y="291" font-size="11.5" fill="#52525B">3</text>
+    <text x="660" y="330" font-size="11" font-weight="600" fill="#A1A1AA">EC-4</text><text x="716" y="330" fill="#3F3F46">No photo on the emergency path</text><rect x="1060" y="321" width="24" height="12" rx="2.5" fill="#0D9488"/><text x="1094" y="331" font-size="11.5" fill="#52525B">3</text>
+    <text x="660" y="370" font-size="11" font-weight="600" fill="#A1A1AA">EC-5</text><text x="716" y="370" fill="#3F3F46">No repair price on the emergency path</text><rect x="1060" y="361" width="32" height="12" rx="2.5" fill="#0D9488"/><text x="1102" y="371" font-size="11.5" fill="#52525B">4</text>
+    <text x="660" y="410" font-size="11" font-weight="600" fill="#A1A1AA">EC-6</text><text x="716" y="410" fill="#3F3F46">Intake one field per turn, water off first</text><rect x="1060" y="401" width="8" height="12" rx="2.5" fill="#0D9488"/><text x="1078" y="411" font-size="11.5" fill="#52525B">1</text>
+    <text x="660" y="450" font-size="11" font-weight="600" fill="#D4D4D8">EC-7</text><text x="716" y="450" fill="#A1A1AA">escalate called with every required field</text><text x="1060" y="450" font-size="11.5" fill="#A1A1AA">step 7</text>
+    <text x="660" y="490" font-size="11" font-weight="600" fill="#A1A1AA">EC-8</text><text x="716" y="490" fill="#3F3F46">Callback promise matches the rules</text><rect x="1060" y="481" width="48" height="12" rx="2.5" fill="#0D9488"/><text x="1118" y="491" font-size="11.5" fill="#52525B">6</text>
+    <text x="660" y="530" font-size="11" font-weight="600" fill="#D4D4D8">EC-9</text><text x="716" y="530" fill="#A1A1AA">Failed escalation is admitted</text><text x="1060" y="530" font-size="11.5" fill="#A1A1AA">step 7</text>
+    <text x="660" y="570" font-size="11" font-weight="600" fill="#A1A1AA">EC-10</text><text x="716" y="570" fill="#3F3F46">STOP line in the emergency closing</text><rect x="1060" y="561" width="16" height="12" rx="2.5" fill="#0D9488"/><text x="1086" y="571" font-size="11.5" fill="#52525B">2</text>
+  </g>
+
+  <line x1="40" y1="612" x2="1200" y2="612" stroke="#E4E4E7" stroke-width="1"/>
+
+  <text x="40" y="646" font-size="12.5" font-weight="600" fill="#18181B">How a case is graded</text>
+  <text x="40" y="672" font-size="12.5" fill="#52525B">A case is a frozen transcript that stops on a caller turn. Claude Haiku writes exactly one reply. That reply is graded three ways:</text>
+  <text x="40" y="698" font-size="12.5" fill="#52525B">code assertions that must hold on every turn (at most one question, no markdown, under 70 words), literal checks for the lines</text>
+  <text x="40" y="720" font-size="12.5" fill="#52525B">that must appear word for word, and an llm-rubric where Claude Sonnet judges Haiku's answer against a standard written in English.</text>
+
+  <text x="40" y="762" font-size="12.5" fill="#52525B">Every defect found on a real call becomes a case before it is fixed. <tspan font-weight="600" fill="#0F766E">The deploy script runs the suite and refuses to push on a failure.</tspan></text>
+</svg>

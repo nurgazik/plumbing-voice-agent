@@ -35,6 +35,8 @@ So: a caller can be triaged, send a photo, hear what it shows, and receive a quo
 
 ## Architecture
 
+![Three layers, one loop: Retell runs the conversation, n8n does the work, Supabase remembers. The rules file is rendered into the prompt at push time and into the workflows at build time.](docs/architecture.svg)
+
 Three layers, one loop.
 
 **Conversation** — Retell runs the live call: speech to text, turn-taking, text to speech, tool calling. Claude Haiku 4.5 handles turns through Retell's built-in LLM. The rules file is rendered into the system prompt at push time, not fetched at call time.
@@ -56,6 +58,8 @@ Two things read it. `agent/push.ts` renders it into the system prompt before dep
 The reason for the split is a lesson that cost a debugging session and is recorded in `docs/decisions.md`: **when the prompt and the rules file disagree, the model follows the rules file.** Anything the agent must get right belongs in structured data, not in prose asking it nicely. Anything it must say word for word is protected by structure — the opener lives in Retell's own settings, not in the prompt.
 
 ## Evals
+
+![Twenty graded behaviours across the two spec calls, with the number of eval cases covering each. Four are not yet gradeable because the steps that produce them aren't built.](docs/evals.svg)
 
 `npm run evals`
 
